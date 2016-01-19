@@ -1,2 +1,1 @@
-# Parallel-Programming
-CSC 548 — Parallel Systems
+# CSC 548 — Parallel Systems
