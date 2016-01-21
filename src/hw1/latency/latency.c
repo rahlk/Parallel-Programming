@@ -4,17 +4,18 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
+#include <string.h> /* memset */
 
 #define	NUMBER_REPS	1000
 
-float std(float data[]);
+float std(float data[], int n);
 
 int main (int argc, char *argv[])
 {
 
 // MPI variables
-int reps, tag, mpitasks, rank, dest, source, rc, n, i;
-float avgT;
+int reps, tag, numtasks, rank, dest, source, rc, n, i=3;
+float avgT, stdev;
 
 // Stats stuff...
 double t, delT, sumT;
@@ -23,7 +24,7 @@ float tarray[NUMBER_REPS];
 // char msg32b[4], msg64b[8], msg128b[16], msg256b[32]
 // msg512b[64], msg1M[128], msg2M[256];
 
-// MPI_Status status;
+MPI_Status status;
 
 // Initialize MPI
 MPI_Init(&argc,&argv);
@@ -33,54 +34,53 @@ MPI_Comm_size(MPI_COMM_WORLD,&numtasks);
 MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 
 // Block the caller until all processes in the communicator have called it
-MPI_Barrier(MPI_COMM_WORLD);
+// MPI_Barrier(MPI_COMM_WORLD);
 
-time = 0;
+// time = 0;
 tag = 1;
 reps = NUMBER_REPS; // Do 1000 repeats - For stats.
 
 /* Note: Rank 0 sends data, Rank 1 receives it.*/
-
-if (rank == 0) {
-  dest = 1;
-  source = 1;
-  printf("Size, Mean, Stdev\n");
-  for (i=2; i<9; i++) {
-    int n_char = 2^i;
-    char msg[n_char] = {'x'};
-    int chunksize = sizeof(msg);
+// for (i=2; i<9; i++) {
+  int n_char = 2^i;
+  char msg = 'x';//[2^i];
+  // char msg[2^i];
+  // memset(msg, 'x', n_char*sizeof(char));
+  int chunksize = sizeof(msg);
+  if (rank == 0) {
+    dest = 1;
+    source = 1;
+    printf("Size, Mean, Stdev\n");
     for (n = 1; n <= reps; n++) {
       // Initialize MPI clock
       t = MPI_Wtime();
       rc = MPI_Send(&msg, chunksize, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
-      rc = MPI_Recv(&msg, chunksize, MPI_CHAR, source, tag, MPI_COMM_WORLD);
+      rc = MPI_Recv(&msg, chunksize, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
       delT = MPI_Wtime() - t;
       sumT += delT;
-      tarray[n]=(float) delT
+      tarray[n]=(float) delT;
       }
      avgT = (sumT*1000000)/reps;
-     stdev = std(tarray);
+     stdev = std(tarray, sizeof(tarray));
      printf("%d, %0.2f, %0.2f",n_char, avgT, stdev);
     }
-  }
-
-
-else if (rank == 1) {
-   dest = 0;
-   source = 0;
-   for (n = 1; n <= reps; n++) {
-      rc = MPI_Recv(&msg, 1, MPI_CHAR, source, tag, MPI_COMM_WORLD);
-      rc = MPI_Send(&msg, 1, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
-      }
-   }
+  else if (rank == 1) {
+     dest = 0;
+     source = 0;
+     for (n = 1; n <= reps; n++) {
+        rc = MPI_Recv(&msg, chunksize, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
+        rc = MPI_Send(&msg, chunksize, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+        }
+     }
+// }
 
 MPI_Finalize();
 exit(0);
 }
 
-float std(float data[]) {
+float std(float data[], int n) {
     float mean=0.0, sum_deviation=0.0;
-    int i, n = sizeof(data);
+    int i;
     for(i=0; i<n;++i)
     {
         mean+=data[i];
