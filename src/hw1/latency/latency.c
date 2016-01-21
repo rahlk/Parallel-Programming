@@ -1,15 +1,4 @@
-/******************************************************************************
-* FILE: mpi_latency.c
-* DESCRIPTION:
-*   MPI Latency Timing Program - C Version
-*   In this example code, a MPI communication timing test is performed.
-*   MPI task 0 will send "reps" number of 1 byte messages to MPI task 1,
-*   waiting for a reply between each rep. Before and after timings are made
-*   for each rep and an average calculated when completed.
-* AUTHOR: Blaise Barney
-* LAST REVISED: 04/13/05
-******************************************************************************/
-#include "mpi.h"
+#include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -24,17 +13,17 @@ int main (int argc, char *argv[])
 {
 
 // MPI variables
-int reps, tag, mpitasks, rank, dest, source, rc, n;
+int reps, tag, mpitasks, rank, dest, source, rc, n, i;
 float avgT;
 
 // Stats stuff...
 double t, delT, sumT;
 float tarray[NUMBER_REPS];
-// Data 32bits...2M
-char msg32b[4], msg64b[8], msg128b[16], msg256b[32]
-msg512b[64], msg1M[128], msg2M[256];
+// // Data 32bits...2M
+// char msg32b[4], msg64b[8], msg128b[16], msg256b[32]
+// msg512b[64], msg1M[128], msg2M[256];
 
-MPI_Status status;
+// MPI_Status status;
 
 // Initialize MPI
 MPI_Init(&argc,&argv);
@@ -64,8 +53,7 @@ if (rank == 0) {
       // Initialize MPI clock
       t = MPI_Wtime();
       rc = MPI_Send(&msg, chunksize, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
-      rc = MPI_Recv(&msg, chunksize, MPI_CHAR, source, tag, MPI_COMM_WORLD,
-                    &status);
+      rc = MPI_Recv(&msg, chunksize, MPI_CHAR, source, tag, MPI_COMM_WORLD);
       delT = MPI_Wtime() - t;
       sumT += delT;
       tarray[n]=(float) delT
@@ -81,8 +69,8 @@ else if (rank == 1) {
    dest = 0;
    source = 0;
    for (n = 1; n <= reps; n++) {
-      rc = MPI_Recv(&msg, 1, MPI_BYTE, source, tag, MPI_COMM_WORLD, &status);
-      rc = MPI_Send(&msg, 1, MPI_BYTE, dest, tag, MPI_COMM_WORLD);
+      rc = MPI_Recv(&msg, 1, MPI_CHAR, source, tag, MPI_COMM_WORLD);
+      rc = MPI_Send(&msg, 1, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
       }
    }
 
