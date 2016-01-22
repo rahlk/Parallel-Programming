@@ -39,4 +39,3 @@ FP_PREC ifn(FP_PREC a, FP_PREC b)
   return (2./3.) * (pow(sqrt(b), 3) - pow(sqrt(a),3));
 //  return 0.5 * (b*b - a*a);
 }
-
