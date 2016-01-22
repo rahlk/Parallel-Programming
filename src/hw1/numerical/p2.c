@@ -143,7 +143,7 @@ int main (int argc, char *argv[])
         dstd_dev = sqrt(dstd_dev/(FP_PREC)NGRID);
         
         intg_err = fabs((ifn(XI, XF) - globalSum)/ifn(XI, XF));
-        printf("%e: %e: %en", davg_err, dstd_dev, intg_err);
+        printf("%0.4e: %0.4e: %0.4e\n", davg_err, dstd_dev, intg_err);
     }
     else
     {
