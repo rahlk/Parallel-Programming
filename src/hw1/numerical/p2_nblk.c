@@ -129,9 +129,10 @@ int main (int argc, char *argv[])
             else
                 rmax = (i+1) * (NGRID/numproc);
             // MPI_Recv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            
+
             MPI_Irecv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, i, MPI_COMM_WORLD, &(requestList[i-1]));
             MPI_Waitany(numproc, requestList, indx, status);
+            printf("From the process%d", i);
         }
         double sum = 0.0;
         for(i=0; i<NGRID; i++)
@@ -148,6 +149,7 @@ int main (int argc, char *argv[])
         
         intg_err = fabs((ifn(XI, XF) - globalSum)/ifn(XI, XF));
         printf("%0.4e: %0.4e: %0.4e\n", davg_err, dstd_dev, intg_err);
+
     }
     else
     {
