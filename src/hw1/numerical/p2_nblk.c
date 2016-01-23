@@ -52,7 +52,7 @@ int main (int argc, char *argv[])
 
     // MPI vailables 
     MPI_Request *requestList,requestNull;
-    MPI_Status  status;
+    MPI_Status  *status;
 
     //"real" grid indices
     int imin, imax;
@@ -122,16 +122,15 @@ int main (int argc, char *argv[])
         }
         for(i = 1; i<numproc; i++)
         {
-            int rmin, rmax;
-            
+            int rmin, rmax, *indx;            
             rmin = 1 + (i * (NGRID/numproc));
-            
             if(i == numproc - 1)
-            rmax = NGRID;
+                rmax = NGRID;
             else
-            rmax = (i+1) * (NGRID/numproc);
+                rmax = (i+1) * (NGRID/numproc);
             // MPI_Recv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            MPI_Recv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Irecv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Waitany(numproc, requestList, indx, status);
         }
         double sum = 0.0;
         for(i=0; i<NGRID; i++)
@@ -151,7 +150,7 @@ int main (int argc, char *argv[])
     }
     else
     {
-        MPI_Send(derr+1, imax-imin+1, MPI_DOUBLE, 0, rank, MPI_COMM_WORLD);
+        MPI_Isend(derr+1, imax-imin+1, MPI_DOUBLE, 0, rank, MPI_COMM_WORLD);
         fflush(stdout);
     }
     
