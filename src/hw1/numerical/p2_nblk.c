@@ -51,7 +51,7 @@ int main (int argc, char *argv[])
     FP_PREC globalSum = 0.0;
 
     // MPI vailables 
-    MPI_Request *requestList,requestNull;
+    MPI_Request *requestList,request;
     MPI_Status  *status;
 
     //"real" grid indices
