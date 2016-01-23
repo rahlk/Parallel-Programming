@@ -116,23 +116,20 @@ int main (int argc, char *argv[])
     if(rank == 0)
     {
         fullerr = (FP_PREC *)malloc(sizeof(FP_PREC)*NGRID);
+        requestList =(MPI_Request*)malloc((numproc-1)*sizeof(MPI_Request));
         for(i = 0;i<range;i++)
         {
             fullerr[i] = derr[i+1];
         }
         for(i = 1; i<numproc; i++)
         {
-            int rmin, rmax, *indx;            
+            int rmin, rmax, *indx;
             rmin = 1 + (i * (NGRID/numproc));
             if(i == numproc - 1)
                 rmax = NGRID;
             else
                 rmax = (i+1) * (NGRID/numproc);
-            // MPI_Recv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-            MPI_Irecv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, i, MPI_COMM_WORLD, &(requestList[i-1]));
-            MPI_Waitany(numproc, requestList, indx, status);
-            printf("From the process%d", i);
+            MPI_Irecv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, 1, MPI_COMM_WORLD, &(requestList[i-1]));
         }
         double sum = 0.0;
         for(i=0; i<NGRID; i++)
