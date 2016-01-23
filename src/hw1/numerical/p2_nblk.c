@@ -49,8 +49,10 @@ int main (int argc, char *argv[])
     FP_PREC *yc, *dyc, *derr, *fullerr;
     FP_PREC *xc, dx, intg, davg_err, dstd_dev, intg_err;
     FP_PREC globalSum = 0.0;
-    
-    MPI_Request *request;
+
+    // MPI vailables 
+    MPI_Request *requestList,requestNull;
+    MPI_Status  status;
 
     //"real" grid indices
     int imin, imax;
@@ -62,8 +64,7 @@ int main (int argc, char *argv[])
     
     else
     imax = (rank+1) * (NGRID/numproc);
-    
-    
+       
     int range = imax - imin + 1;
     
     xc =  (FP_PREC*) malloc((range + 2) * sizeof(FP_PREC));
@@ -129,6 +130,7 @@ int main (int argc, char *argv[])
             rmax = NGRID;
             else
             rmax = (i+1) * (NGRID/numproc);
+            // MPI_Recv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             MPI_Recv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
         double sum = 0.0;
