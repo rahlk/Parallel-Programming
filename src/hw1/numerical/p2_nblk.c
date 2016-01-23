@@ -150,7 +150,7 @@ int main (int argc, char *argv[])
     }
     else
     {
-        MPI_Isend(derr+1, imax-imin+1, MPI_DOUBLE, 0, rank, MPI_COMM_WORLD);
+        MPI_Isend(derr+1, imax-imin+1, MPI_DOUBLE, 0, rank, MPI_COMM_WORLD, &request);
         fflush(stdout);
     }
     
