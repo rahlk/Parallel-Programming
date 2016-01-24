@@ -1,4 +1,4 @@
-vim #include <mpi.h>
+#include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -40,23 +40,28 @@ tag = 1;
 reps = NUMBER_REPS; // Do 1000 repeats - For stats.
 float tarray[numtasks][numtasks];
 /* Note: Rank 0 sends data, Rank 1 receives it.*/
-for (rank0 = 0; rank0 < numtasks; rank0++) {
-    char msg = 'x';
-    if (rank == rank0) {
-      for (rank1 = 0; rank1<numtasks; rank1++) {
-        if (rank1!=rank0){
-          dest=rank1;
-          source=rank1;
-          printf("Rank0=%d, From: %d, To=%d\n", rank0, rank0, rank1);
-          rc = MPI_Isend(&msg, 1, MPI_CHAR, rank1, tag, MPI_COMM_WORLD, &rq);
-          rc = MPI_Irecv(&msg, 1, MPI_CHAR, rank1, tag, MPI_COMM_WORLD, &rq);
-          printf("Rank1=%d, From: %d, To=%d\n", rank1, rank1, rank0);
-          rc = MPI_Isend(&msg, 1, MPI_CHAR, rank0, tag, MPI_COMM_WORLD, &rq);
-          rc = MPI_Irecv(&msg, 1, MPI_CHAR, rank0, tag, MPI_COMM_WORLD, &rq);
-          }
-        }
-     }
+// for (rank0 = 0; rank0 < numtasks; rank0++) {
+char msg = 'x';
+// Tstart = MPI_Wtime()
+// if (rank == rank0) {
+for (rank1 = 0; rank1<numtasks; rank1++) {
+  if (rank1!=rank){
+    dest=rank1;
+    source=rank1;
+    Tstart = MPI_Wtime()
+    printf("From Rank0: %d, To Rank1=%d\n", rank, rank1);
+    rc = MPI_Isend(&msg, 1, MPI_CHAR, rank1, tag, MPI_COMM_WORLD, &rq);
+    rc = MPI_Irecv(&msg, 1, MPI_CHAR, rank1, tag, MPI_COMM_WORLD, &rq);
+    printf("From Rank1=%d, To Rank0: %d, To=%d\n", rank1, rank);
+    rc = MPI_Isend(&msg, 1, MPI_CHAR, rank, tag, MPI_COMM_WORLD, &rq);
+    rc = MPI_Irecv(&msg, 1, MPI_CHAR, rank, tag, MPI_COMM_WORLD, &rq);
+    Tend = MPI_Wtime()
+    delT = Tend-Tstart;
+    printf("Latency%e\n",delT);
+    }
   }
+ // }
+  // }
 
 //   for (i=2; i<3; i++) {
 //     int n_char = pow(2,i);
