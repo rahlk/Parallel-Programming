@@ -48,16 +48,16 @@ for (rank1 = 0; rank1<numtasks; rank1++) {
   if (rank1!=rank){
     dest=rank1;
     source=rank1;
-    Tstart = MPI_Wtime()
-    printf("From Rank0: %d, To Rank1=%d\n", rank, rank1);
+    Tstart = MPI_Wtime();
+    // printf("From Rank0: %d, To Rank1=%d\n", rank, rank1);
     rc = MPI_Isend(&msg, 1, MPI_CHAR, rank1, tag, MPI_COMM_WORLD, &rq);
     rc = MPI_Irecv(&msg, 1, MPI_CHAR, rank1, tag, MPI_COMM_WORLD, &rq);
-    printf("From Rank1=%d, To Rank0: %d, To=%d\n", rank1, rank);
+    // printf("From Rank1=%d, To Rank0: %d, To=%d\n", rank1, rank);
     rc = MPI_Isend(&msg, 1, MPI_CHAR, rank, tag, MPI_COMM_WORLD, &rq);
     rc = MPI_Irecv(&msg, 1, MPI_CHAR, rank, tag, MPI_COMM_WORLD, &rq);
-    Tend = MPI_Wtime()
+    Tend = MPI_Wtime();
     delT = Tend-Tstart;
-    printf("Latency%e\n",delT);
+    printf("Rank0=%d to Rank1=%d\tLatency%e\n",rank, rank1, delT);
     }
   }
  // }
