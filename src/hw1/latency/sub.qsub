@@ -9,7 +9,7 @@
 #PBS -l nodes=2,walltime=00:05:00
 #commented out stuff:
 #2 nodes with 16 processors each and 5 min CPU time
-#X PBS -l nodes=2:ppn=16,cput=00:05:00
+#X PBS -l nodes=2:ppn=1,cput=00:05:00
 #Q name
 #PBS -q default
 #your email
