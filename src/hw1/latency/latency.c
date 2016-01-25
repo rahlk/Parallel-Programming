@@ -20,10 +20,6 @@ float avgT, stdev;
 // Stats stuff...
 double Tstart, Tend, delT, sumT;
 float tarray[NUMBER_REPS];
-// // Data 32bits...2M
-// char msg32b[4], msg64b[8], msg128b[16], msg256b[32]
-// msg512b[64], msg1M[128], msg2M[256];
-printf("Data_Size Mean Stdev\n");
 MPI_Status status;
 
 // Initialize MPI
@@ -41,34 +37,32 @@ tag = 1;
 reps = NUMBER_REPS; // Do 1000 repeats - For stats.
 
 /* Note: Rank 0 sends data, Rank 1 receives it.*/
-for (i=2; i<9; i++) {
+for (i=5; i<12; i++) {
   int n_char = pow(2,i);
   // char msg = 'x';//[2^i];
   char msg[n_char];
   memset(msg, 'x', n_char*sizeof(char));
   int chunksize = sizeof(msg);
   if (rank == 0) {
-    dest = 1;
-    source = 1;
-    for (n = 0; n < reps; n++) {
-      // Initialize MPI clock
-      Tstart = MPI_Wtime();
-      rc = MPI_Send(&msg, chunksize, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
-      rc = MPI_Recv(&msg, chunksize, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
-      Tend = MPI_Wtime();
-      delT = Tend - Tstart;
-      sumT+=delT*1000000;
-      tarray[n]=delT*1000000;
+    printf("%d \t ", sizeof(char)*sizeof(msg));
+    for (dest=1;dest<numtasks;dest++) {
+      for (n = 0; n < reps; n++) {
+        // Initialize MPI clock
+        Tstart = MPI_Wtime();
+        rc = MPI_Send(&msg, chunksize, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+        rc = MPI_Recv(&msg, chunksize, MPI_CHAR, dest, tag, MPI_COMM_WORLD, &status);
+        Tend = MPI_Wtime();
+        delT = Tend - Tstart;
+        sumT+=delT;
+        tarray[n]=delT;
+        }
+        avgT = (sumT)/reps;
+        stdev = std(tarray, reps);
+        printf("%0.2e %0.2e ",avgT, stdev);
       }
-
-    //  for (n=0; n<=reps; n++)
-    //    printf("%f\n",tarray[n]);
-
-     avgT = (sumT)/reps;
-     stdev = std(tarray, reps);
-     printf("%d %0.2f %0.2f\n",8*n_char, avgT, stdev);
+    printf("\n");
     }
-  else if (rank == 1) {
+  else {
      dest = 0;
      source = 0;
      for (n = 1; n <= reps; n++) {

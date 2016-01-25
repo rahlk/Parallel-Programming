@@ -43,47 +43,42 @@ double udarr[numtasks];
 // tdarr[rank]=0;
 // printf("Rank %d\t",rank);
 for (i=2;i<11;i++) {
-  // sumT=0;
-  // stdT=0;
   int n_char = pow(2,i);
   char msg[n_char];
   memset(msg, 'x', n_char*sizeof(char));
   int chunksize=sizeof(msg);
-  // double *tarray;
-  printf("M:%d\t", sizeof(char)*sizeof(msg));
-  for (rank0 = 0; rank0<numtasks; rank0++) {
-    tdarr[rank0]=0;
-    udarr[rank0]=0;
-    if (rank0==rank)
-      for (rank1=0; rank1<numtasks; rank1++)
-        if (rank1!=rank0) {
-          // double tarray[numtasks];
-          sumT=0;
-          int rep;
-          for (rep=0; rep<NUMBER_REPS; rep++) {
-            Tstart = MPI_Wtime();
-            rc = MPI_Send(&msg, chunksize, MPI_CHAR, rank1, tag, MPI_COMM_WORLD);
-            rc = MPI_Recv(&msg, chunksize, MPI_CHAR, rank1, tag, MPI_COMM_WORLD, &status);
-            Tend=MPI_Wtime();
-            // MPI_Barrier(MPI_COMM_WORLD);
-            delT = Tend-Tstart;
-            Stdarr[rep]=delT;
-            sumT+=delT;
-          }
-          tdarr[rank1]=std(Stdarr, reps);
-          udarr[rank1]=sumT/reps;
-          printf("%d:%d %0.2e\n",rank,rank1,udarr[rank1]);
-          // tarray[dest]=delT;
-          // printf("%d %d %d \t %0.2e\n", i*sizeof(msg), rank, rank1, delT);
-      }
-    else {
-        dest=rank0;
-        source=rank0;
-        int chunksize = sizeof(msg);
-        rc = MPI_Send(&msg, chunksize, MPI_CHAR, rank0, tag, MPI_COMM_WORLD);
-        rc = MPI_Recv(&msg, chunksize, MPI_CHAR, rank0, tag, MPI_COMM_WORLD, &status);
-        }
-      }
+  if (rank==0) {
+    double statArr0[9][numtasks-1];
+    double statArr1[9][numtasks-1];
+
+    for (rank1=1; rank1<numtasks; rank1++) {
+      // double tarray[numtasks];
+      sumT=0;
+      int rep;
+      // for (rep=0; rep<NUMBER_REPS; rep++) {
+        Tstart = MPI_Wtime();
+        rc = MPI_Send(&msg, chunksize, MPI_CHAR, rank1, tag, MPI_COMM_WORLD);
+        rc = MPI_Recv(&msg, chunksize, MPI_CHAR, rank1, tag, MPI_COMM_WORLD, &status);
+        Tend=MPI_Wtime();
+        delT = Tend-Tstart;
+        Stdarr[rep]=delT;
+        sumT+=delT;
+      // }
+    statArr0[i-2][rank1-1]=std(Stdarr, reps);
+    statArr1[i-2][rank1-1]=sumT/reps;
+    //
+    // printf("%d\t%0.2e %0.2e\t", i*sizeof(msg), udarr[rank1-1], tdarr[rank1-1]);
+    }
+  }
+  else {
+    dest=rank0;
+    source=rank0;
+    int chunksize = sizeof(msg);
+    rc = MPI_Send(&msg, chunksize, MPI_CHAR, 0, rank, MPI_COMM_WORLD);
+    rc = MPI_Recv(&msg, chunksize, MPI_CHAR, 0, rank, MPI_COMM_WORLD, &status);
+    }
+  }
+printf("\n");
 
   // stdT=std(tdarr, numtasks);
   // printf("%d, %d\n", sizeof(tdarr), sizeof(udarr));
@@ -95,9 +90,7 @@ for (i=2;i<11;i++) {
   // for (i=0;i<numtasks;i++)
   //   if (i!=rank)
   //     printf("%d:%0.2e ",i,tarray[i]);
-  printf("\n");
-}
-printf("\n");
+// printf("\n");
 // printf("%e, %e\n", sumT/numtasks, stdT);
 MPI_Finalize();
 exit(0);
