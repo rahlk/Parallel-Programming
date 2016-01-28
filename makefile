@@ -1,8 +1,8 @@
 typo: ready
-	@- git add --all .	
-	@- git status
-	@- git commit -am "commit with a makefile"
-	@- git push origin master 
+	@- env GIT_SSL_NO_VERIFY=true git add --all .	
+	@- env GIT_SSL_NO_VERIFY=true git status
+	@- env GIT_SSL_NO_VERIFY=true git commit -am "commit with a makefile"
+	@- env GIT_SSL_NO_VERIFY=true git push origin master 
 
 commit: ready 
 	@- git status
