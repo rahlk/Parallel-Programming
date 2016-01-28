@@ -39,77 +39,6 @@ int main(int, char**);
 
 int main (int argc, char *argv[])
 {
-<<<<<<< HEAD
-	int   numproc, rank, len,i;
-	char  hostname[MPI_MAX_PROCESSOR_NAME];
-	MPI_Init(&argc, &argv);
-	MPI_Comm_size(MPI_COMM_WORLD, &numproc);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Get_processor_name(hostname, &len);
-	
-    FP_PREC     *yc, *dyc;
-	FP_PREC     *xc, dx, intg;
-
-    //"real" grid indices
-    int         imin, imax;  
-
-    imin = 1 + (rank * (NGRID/numproc));
-	
-	if(rank == numproc - 1)
-		imax = XF;
-	
-	else
-    imax = (rank+1) * (NGRID/numproc);
-	
-	printf("min: %d, max: %d\n",imin,imax);
-	
-	int range = imax - imin + 1;
-	
-	xc  =   (FP_PREC*) malloc((range + 2) * sizeof(FP_PREC));
-	yc  =   (FP_PREC*) malloc((range + 2) * sizeof(FP_PREC));
-	dyc  =   (FP_PREC*) malloc((range + 2) * sizeof(FP_PREC));
-	
-    for (i = 1; i <= range ; i++)
-    {
-      xc[i] = imin + (XF - XI) * (FP_PREC)(i - 1)/(FP_PREC)(NGRID - 1);
-    }
-	
-    dx = xc[2] - xc[1];
-    xc[0] = xc[1] - dx;
-    xc[range + 1] = xc[range] + dx;
-	
-    for( i = 1; i <= range; i++ )
-    {
-      yc[i] = fn(xc[i]);
-    }
-	
-	yc[0] = fn(xc[0]);
-	yc[range + 1] = fn(xc[range + 1]);
-	
-    for (i = 1; i <= range; i++)
-    {
-      dyc[i] = (yc[i + 1] - yc[i - 1])/(2.0 * dx);
-    }
-	
-    intg = 0.0;
-    for (i = 1; i <= range; i++)
-    {
-      //there are NGRID points, so there are NGRID-1 integration zones.	
-		if((rank == numproc - 1) && (i == range))
-		  break;
-		  
-		intg += 0.5 * (xc[i + 1] - xc[i]) * (yc[i + 1] + yc[i]);
-    }
-	
-	//if(rank == 0)
-	{
-		for(i=0; i<=range+1; i++)
-			printf("%lf: %lf: %lf\n",xc[i],yc[i],dyc[i]);
-		printf("Integration: %lf\n",intg);
-	}
-	
-	MPI_Finalize();
-=======
     int  numproc, rank, len,i;
     char hostname[MPI_MAX_PROCESSOR_NAME];
     MPI_Init(&argc, &argv);
@@ -120,8 +49,10 @@ int main (int argc, char *argv[])
     FP_PREC *yc, *dyc, *derr, *fullerr;
     FP_PREC *xc, dx, intg, davg_err, dstd_dev, intg_err;
     FP_PREC globalSum = 0.0;
-    
-    MPI_Request *request;
+
+    // MPI vailables 
+    MPI_Request *requestList,request;
+    MPI_Status  *status;
 
     //"real" grid indices
     int imin, imax;
@@ -133,8 +64,7 @@ int main (int argc, char *argv[])
     
     else
     imax = (rank+1) * (NGRID/numproc);
-    
-    
+       
     int range = imax - imin + 1;
     
     xc =  (FP_PREC*) malloc((range + 2) * sizeof(FP_PREC));
@@ -186,21 +116,20 @@ int main (int argc, char *argv[])
     if(rank == 0)
     {
         fullerr = (FP_PREC *)malloc(sizeof(FP_PREC)*NGRID);
+        requestList =(MPI_Request*)malloc((numproc-1)*sizeof(MPI_Request));
         for(i = 0;i<range;i++)
         {
             fullerr[i] = derr[i+1];
         }
         for(i = 1; i<numproc; i++)
         {
-            int rmin, rmax;
-            
+            int rmin, rmax, *indx;
             rmin = 1 + (i * (NGRID/numproc));
-            
             if(i == numproc - 1)
-            rmax = NGRID;
+                rmax = NGRID;
             else
-            rmax = (i+1) * (NGRID/numproc);
-            MPI_Recv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                rmax = (i+1) * (NGRID/numproc);
+            MPI_Irecv(fullerr+rmin-1, rmax-rmin+1, MPI_DOUBLE, i, 1, MPI_COMM_WORLD, &(requestList[i-1]));
         }
         double sum = 0.0;
         for(i=0; i<NGRID; i++)
@@ -217,13 +146,13 @@ int main (int argc, char *argv[])
         
         intg_err = fabs((ifn(XI, XF) - globalSum)/ifn(XI, XF));
         printf("%0.4e: %0.4e: %0.4e\n", davg_err, dstd_dev, intg_err);
+
     }
     else
     {
-        MPI_Send(derr+1, imax-imin+1, MPI_DOUBLE, 0, rank, MPI_COMM_WORLD);
+        MPI_Isend(derr+1, imax-imin+1, MPI_DOUBLE, 0, rank, MPI_COMM_WORLD, &request);
         fflush(stdout);
     }
     
     MPI_Finalize();
->>>>>>> 5875ebd784803c689b768a62fa8338886e177277
 }
