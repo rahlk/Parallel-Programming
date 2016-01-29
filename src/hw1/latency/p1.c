@@ -8,7 +8,7 @@
 
 #define	NUMBER_REPS	1000
 
-float std(float data[], int n);
+float std(double data[], int n);
 
 int main (int argc, char *argv[])
 {
@@ -19,7 +19,6 @@ float avgT, stdev;
 
 // Stats stuff...
 double Tstart, Tend, delT, sumT;
-float tarray[NUMBER_REPS];
 MPI_Status status;
 
 // Initialize MPI
@@ -46,6 +45,8 @@ for (i=5; i<12; i++) {
   if (rank == 0) {
     printf("%d \t ", sizeof(char)*sizeof(msg));
     for (dest=1;dest<numtasks;dest++) {
+      sumT=0;
+      double tarray[NUMBER_REPS];
       for (n = 0; n < reps; n++) {
         // Initialize MPI clock
         Tstart = MPI_Wtime();
@@ -76,7 +77,7 @@ MPI_Finalize();
 exit(0);
 }
 
-float std(float data[], int n) {
+float std(double data[], int n) {
     float mean=0.0, sum_deviation=0.0;
     int i;
     for(i=0; i<n;++i)
@@ -84,7 +85,7 @@ float std(float data[], int n) {
         mean+=data[i];
     }
     mean=mean/n;
-    for(i=0; i<n;++i)
-    sum_deviation+=(data[i]-mean)*(data[i]-mean);
-    return sqrt(sum_deviation/n);
+    for(i=0; i<n;i++)
+      sum_deviation+=(data[i]-mean);
+    return sqrt(sum_deviation/(n-1));
 }
