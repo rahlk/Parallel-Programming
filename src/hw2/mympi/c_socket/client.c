@@ -45,17 +45,17 @@ int main(int argc, char **argv)
  printf("Official name is: %s\n", he->h_name);
  printf("    IP addresses: ");
  addr_list = (struct in_addr **)he->h_addr_list;
- for(i = 0; addr_list[i] != NULL; i++) {
-     printf("%s ", inet_ntoa(*addr_list[i]));
- }
+ printf("%s ", inet_ntoa(*addr_list[0]));
  printf("\n");
 
  //Creation of the socket
  memset(&servaddr, 0, sizeof(servaddr));
  servaddr.sin_family = AF_INET;
+ // servaddr.sin_addr.s_addr= inet_addr(argv[1]);
+ // servaddr.sin_addr.s_addr= inet_addr(inet_ntoa(*addr_list[0]));
  servaddr.sin_addr.s_addr= inet_addr(inet_ntoa(*addr_list[0]));
  servaddr.sin_port =  htons(SERV_PORT); //convert to big-endian order
-
+ printf("%d\n", sizeof(servaddr));
  //Connection of the client to the socket
  if (connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr))<0) {
   perror("Problem in connecting to the server");

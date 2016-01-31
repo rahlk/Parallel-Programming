@@ -14,17 +14,34 @@
 
 int main (int argc, char **argv)
 {
- int listenfd, connfd, n;
+ int i, listenfd, connfd, n;
  socklen_t clilen;
  char buf[MAXLINE];
  struct sockaddr_in cliaddr, servaddr;
+ struct hostent *he;
+ struct in_addr **addr_list;
 
  //creation of the socket
  listenfd = socket (AF_INET, SOCK_STREAM, 0);
 
+ if ((he = gethostbyname(argv[1])) == NULL) {  // get the host info
+     herror("gethostbyname");
+     return 2;
+ }
+
+ // print information about this host:
+ printf("Official name is: %s\n", he->h_name);
+ printf("    IP addresses: ");
+ addr_list = (struct in_addr **)he->h_addr_list;
+ for(i = 0; addr_list[i] != NULL; i++) {
+     printf("%s ", inet_ntoa(*addr_list[i]));
+ }
+ printf("\n");
+
  //preparation of the socket address
  servaddr.sin_family = AF_INET;
  servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+ // servaddr.sin_addr.s_addr = inet_addr(inet_ntoa(*addr_list[0]));
  servaddr.sin_port = htons(SERV_PORT);
 
  bind(listenfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
