@@ -1,0 +1,4 @@
+#Ignore all
+*
+# Unignore Files with extensions
+!*.*
