@@ -35,27 +35,23 @@ int main(int argc, char **argv)
   exit(2);
  }
 
-
- if ((he = gethostbyname(argv[1])) == NULL) {  // get the host info
+ // get the host info
+ if ((he = gethostbyname(argv[1])) == NULL) {
      herror("gethostbyname");
      return 2;
  }
 
  // print information about this host:
- printf("Official name is: %s\n", he->h_name);
- printf("    IP addresses: ");
+ printf("Machine name: %s\n", he->h_name);
  addr_list = (struct in_addr **)he->h_addr_list;
- printf("%s ", inet_ntoa(*addr_list[0]));
- printf("\n");
+ printf("IP address: %s \n", inet_ntoa(*addr_list[0]));
 
  //Creation of the socket
  memset(&servaddr, 0, sizeof(servaddr));
  servaddr.sin_family = AF_INET;
- // servaddr.sin_addr.s_addr= inet_addr(argv[1]);
- // servaddr.sin_addr.s_addr= inet_addr(inet_ntoa(*addr_list[0]));
  servaddr.sin_addr.s_addr= inet_addr(inet_ntoa(*addr_list[0]));
  servaddr.sin_port =  htons(SERV_PORT); //convert to big-endian order
- printf("%d\n", sizeof(servaddr));
+
  //Connection of the client to the socket
  if (connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr))<0) {
   perror("Problem in connecting to the server");
