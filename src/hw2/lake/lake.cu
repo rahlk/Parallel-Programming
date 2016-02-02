@@ -14,9 +14,11 @@
 #define MAX_PSZ 10
 #define TSCALE 1.0
 #define VSQR 0.1
+#define NINEPTSTENCIL 1
 
 void init(double *u, double *pebbles, int n);
 void evolve(double *un, double *uc, double *uo, double *pebbles, int n, double h, double dt, double t);
+void evolve9pt(double *un, double *uc, double *uo, double *pebbles, int n, double h, double dt, double t);
 int tpdt(double *t, double dt, double end_time);
 void print_heatmap(char *filename, double *u, int n, double h);
 void init_pebbles(double *p, int pn, int n);
@@ -82,6 +84,7 @@ int main(int argc, char *argv[])
 
 
   print_heatmap("lake_f.dat", u_cpu, npoints, h);
+  print_heatmap("lake_f_GPU.dat", u_gpu, npoints, h);
 
   free(u_i0);
   free(u_i1);
@@ -109,8 +112,14 @@ void run_cpu(double *u, double *u0, double *u1, double *pebbles, int n, double h
 
   while(1)
   {
-    evolve(un, uc, uo, pebbles, n, h, dt, t);
-
+    if(NINEPTSTENCIL)
+    {
+      evolve9pt(un, uc, uo, pebbles, n, h, dt, t);
+    }
+    else
+    {
+      evolve(un, uc, uo, pebbles, n, h, dt, t);
+    }
     memcpy(uo, uc, sizeof(double) * n * n);
     memcpy(uc, un, sizeof(double) * n * n);
 
@@ -180,8 +189,29 @@ void evolve(double *un, double *uc, double *uo, double *pebbles, int n, double h
       }
       else
       {
-        un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + uc[idx+1] + 
-                    uc[idx + n] + uc[idx - n] - 4 * uc[idx])/(h * h) + f(pebbles[idx],t));
+        un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + uc[idx+1] + uc[idx + n] + uc[idx - n] - 4 * uc[idx])/(h * h) + f(pebbles[idx],t));
+      }
+    }
+  }
+}
+
+void evolve9pt(double *un, double *uc, double *uo, double *pebbles, int n, double h, double dt, double t)
+{
+  int i, j, idx;
+
+  for( i = 0; i < n; i++)
+  {
+    for( j = 0; j < n; j++)
+    {
+      idx = j + i * n;
+
+      if( i == 0 || i == n - 1 || j == 0 || j == n - 1)
+      {
+        un[idx] = 0.;
+      }
+      else
+      {
+        un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + uc[idx+1] + uc[idx + n] + uc[idx - n] + 0.25*(uc[idx + n - 1] + uc[idx + n + 1] + uc[idx - n - 1] + uc[idx - n + 1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
       }
     }
   }

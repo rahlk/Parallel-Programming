@@ -10,3 +10,6 @@ plot 'lake_i.dat' using 1:2:3 with image
 
 set output 'lake_f.png'
 plot 'lake_f.dat' using 1:2:3 with image
+
+set output 'lake_f_GPU.png'
+plot 'lake_f_GPU.dat' using 1:2:3 with image
