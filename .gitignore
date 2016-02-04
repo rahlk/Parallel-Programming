@@ -1,8 +1,3 @@
-# Ignore all
-*
-# Don't ingore files with extensions
-!*.*
-
 # Compiled Object files
 *.slo
 *.lo
