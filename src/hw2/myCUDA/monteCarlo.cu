@@ -10,7 +10,7 @@
 
 __global__ void init_stuff(curandState *state) {
  int idx = blockIdx.x * blockDim.x + threadIdx.x;
- curand_init(1337, idx, 0, &state[idx]);
+ if (id<count) curand_init(1337, idx, 0, &state[idx]);
 }
 
 
@@ -44,13 +44,10 @@ int main(int argc, char** argv) {
       printf("Error in memory allocation.\n");
       return 0;
   }
-
-
   if (cudaMalloc(&d_state, sizeof(curandState)*niter) != cudaSuccess) {
       printf("Error in memory allocation for random state.\n");
       return 0;
   }
-
   if (cudaMemcpy (d_pi, h_pi, sizeof(int)*niter, cudaMemcpyHostToDevice) != cudaSuccess) {
       printf("Error in copy from host to device.\n");
       cudaFree(d_pi);
