@@ -355,22 +355,77 @@ void evolve9pt(double *un, double *uc, double *uo, double *pebbles, int n, doubl
   int i, j, idx;
 
   for( i = 0; i < n; i++)
-  {
-    for( j = 0; j < n; j++)
-    {
+    for( j = 0; j < n; j++) {
       idx = j + i * n;
-
-      if( i == 0 || i == n - 1 || j == 0 || j == n - 1)
-      {
-        // Cdde for the fringe regions goes here...
-        un[idx] = 0.;
-      }
-      else
-      {
+      if(!(i == 0 || i == n - 1 || j == 0 || j == n - 1)) {
         un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + uc[idx+1] + uc[idx + n] + uc[idx - n] + 0.25*(uc[idx + n - 1] + uc[idx + n + 1] + uc[idx - n - 1] + uc[idx - n + 1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
       }
+      else {
+        // Code for the fringe regions goes here...
+        switch (rank) {
+          case 1:
+          if (i==0 || j==0) {
+            un[idx]=0;
+          }
+          else if(i==n-1 && j==n-1) { // Bottom right corner
+            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + col[i] + row[j] + uc[idx - n] + 0.25*(row[j-1] + *indv + uc[idx - n - 1] + col[i-1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+          }
+          else if(j==n-1 && i<n-1) { // Right edge
+            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + col[i] + uc[idx + n] + uc[idx - n] + 0.25*(uc[idx + n - 1] + col[i + 1] + uc[idx - n - 1] + col[i-1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+          }
+          else if(i==n-1 && j<n-1) { // Bottom edge
+            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + uc[idx+1] + row[j] + uc[idx - n] + 0.25*(row[j - 1] + row[j + 1] + uc[idx - n - 1] + uc[idx - n + 1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+          }
+          break;
+
+          case 2:
+          if (i==0 || j==n-1){
+            un[idx]=0;
+          }
+          else if(i==n-1 && j==0) { // Bottom left corner
+            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((col[i] + uc[idx+1] + row[j] + uc[idx - n] + 0.25*(*indv + row[j + 1] + col[i - 1] + uc[idx - n + 1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+          }
+          else if(j==0 && i<n-1) { // Left edge
+            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((col[i] + uc[idx+1] + uc[idx + n] + uc[idx - n] + 0.25*(col[i+1] + uc[idx + n + 1] + col[i-1] + uc[idx - n + 1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+          }
+          else if(i==n-1 && j>0) { // Bottom Edge
+            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + uc[idx+1] + row[j] + uc[idx - n] + 0.25*(row[j - 1] + row[j + 1] + uc[idx - n - 1] + uc[idx - n + 1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+          }
+          break;
+
+          case 3:
+            if (i==n-1 || j==0){
+              un[idx]=0;
+            }
+            else if(i==0 && j==n-1) { // Top right corner
+              un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + col[i] + uc[idx + n] + row[j] + 0.25*(uc[idx + n - 1] + col[i+1] + row[j-1] + *indv)- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+            }
+            else if(j==n-1 && i>0) { // Left edge
+            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[i                 dx-1] + col[i] + uc[idx + n] + uc[idx - n] + 0.25*(uc[idx + n - 1] + col[i+1] + uc[idx - n - 1] + col[i-1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+            }
+            else if(i==0 && j<n-1) { // Top Edge
+              un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + uc[idx+1] + uc[idx + n] + row[j] + 0.25*(uc[idx + n - 1] + uc[idx + n + 1] + row[j-1] + row[j+ 1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+            }
+            break;
+
+          case 4:
+          // To do ....
+          if (i==n-1 || j==n-1){
+            un[idx]=0;
+          }
+          else if(i==0 && j==0) { // Top left corner
+            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((col[i] + uc[idx+1] + uc[idx + n] + row[j] + 0.25*(col[i+1] + uc[idx+n+1] + *indv + row[j+1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+          }
+          else if(j==0 && i>0) { // Right edge
+            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((col[i] + uc[idx+1] + uc[idx + n] + uc[idx - n] + 0.25*(col[i+1] + uc[idx + n + 1] + col[i-1] + uc[idx - n + 1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+          }
+          else if(i==n-1 && j>0) { // Bottom Edge
+            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + uc[idx+1] + uc[idx + n] + uc[idx - n] + 0.25*(uc[idx + n - 1] + uc[idx + n + 1] + uc[idx - n - 1] + uc[idx - n + 1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+          }
+          break;
+        }
+      }
     }
-  }
 }
 
 void print_heatmap(char *filename, double *u, int n, double h)
