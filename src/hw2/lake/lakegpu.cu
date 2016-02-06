@@ -86,10 +86,10 @@ void run_gpu(double *u, double *u0, double *u1, double *pebbles, int n, double h
 {
 	cudaEvent_t kstart, kstop;
 	float ktime;
-        
+
 	double *un, *uc, *uo, *pb, *temp;
   double t, dt;
-        /* Set up device timers */  
+        /* Set up device timers */
 	CUDA_CALL(cudaSetDevice(0));
 	CUDA_CALL(cudaEventCreate(&kstart));
 	CUDA_CALL(cudaEventCreate(&kstop));
@@ -121,7 +121,7 @@ void run_gpu(double *u, double *u0, double *u1, double *pebbles, int n, double h
     if(!tpdt(&t, dt, end_time))
       break;
   }
-	cudaMemcpy(u, uc, sizeof(double) * n * n, cudaMemcpyDeviceToHost);
+	cudaMemcpy(u, un, sizeof(double) * n * n, cudaMemcpyDeviceToHost);
         /* Stop GPU computation timer */
 	CUDA_CALL(cudaEventRecord(kstop, 0));
 	CUDA_CALL(cudaEventSynchronize(kstop));

@@ -27,6 +27,9 @@ __global__ void cudaMonte(int* pi, int count, curandState* state) {
   }
   __syncthreads();
 
+  for (int i=1; i<count;i++) {
+    pi[0]+=pi[i];
+  }
 }
 
 int main(int argc, char** argv) {
@@ -64,10 +67,13 @@ int main(int argc, char** argv) {
       return 0;
   }
 
-  for (int i=1;i<niter;i++) {
-    h_pi[0]+=h_pi[i];
-  }
-
   pi= (double) h_pi[0]/niter*4;
   printf("# of trials= %d , estimate of pi is %g \n",niter,pi);
+
+  // for (int i=1;i<niter;i++) {
+  //   h_pi[0]+=h_pi[i];
+  // }
+  //
+  // pi= (double) h_pi[0]/niter*4;
+  // printf("# of trials= %d , estimate of pi is %g \n",niter,pi);
 }
