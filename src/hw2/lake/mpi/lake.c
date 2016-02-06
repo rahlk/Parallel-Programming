@@ -19,7 +19,7 @@
 
 void init(double *u, double *pebbles, int n);
 void evolve(double *un, double *uc, double *uo, double *pebbles, int n, double h, double dt, double t);
-void evolve9pt(double *un, double *uc, double *uo, double *pebbles, int n, double *row, double *col, double *indv, double h, double dt, double t);
+void evolve9pt(double *un, double *uc, double *uo, double *pebbles, int n, int rank, double *row, double *col, double *indv, double h, double dt, double t);
 int tpdt(double *t, double dt, double end_time);
 void print_heatmap(char *filename, double *u, int n, double h);
 void init_pebbles(double *p, int pn, int n);
@@ -62,15 +62,16 @@ int main(int argc, char *argv[])
 
     double *u_i0, *u_i1;
     double *u_cpu, *u_gpu, *pebs;
-    double *peb;
+    double *peb, *n_cpu;
     double elapsed_cpu, elapsed_gpu;
     struct timeval cpu_start, cpu_end, gpu_start, gpu_end;
 
     peb = (double*)malloc(sizeof(double) * size);
+    u_i0 = (double*)malloc(sizeof(double) * narea);
+    u_i1 = (double*)malloc(sizeof(double) * narea);
+    u_cpu = (double*)malloc(sizeof(double) * narea);
 
     if(once) {
-      u_i0 = (double*)malloc(sizeof(double) * narea);
-      u_i1 = (double*)malloc(sizeof(double) * narea);
       pebs = (double*)malloc(sizeof(double) * narea);
       printf("Rank0: Running a (%d x %d) grid, until %f, with %d threads\n", npoints, npoints, end_time, nthreads);
       init_pebbles(pebs, npebs, npoints);
@@ -86,6 +87,12 @@ int main(int argc, char *argv[])
       }
       once=false;
     }
+
+    // Reveive final lake from the cores
+    for (i=1; i<numproc; i++) {
+      
+    }
+
   }
 
   else {
@@ -100,7 +107,7 @@ int main(int argc, char *argv[])
     un = (double*)malloc(sizeof(double) * (npoints/2)*(npoints/2));
     pebble = (double*)malloc(sizeof(double) * (npoints/2)*(npoints/2));
 
-    MPI_Recv(pebble, size, MPI_DOUBLE, 0, i, MPI_COMM_WORLD, &status);
+    MPI_Recv(pebble, size, MPI_DOUBLE, 0, rank, MPI_COMM_WORLD, &status);
 
     MPI_Get_count(&status, MPI_INT, &number_amount);
     printf("1 received %d numbers from 0. Message source = %d, "
@@ -149,29 +156,30 @@ int main(int argc, char *argv[])
       MPI_Recv(indv, 1, MPI_DOUBLE, *diag, *diag, MPI_COMM_WORLD, &status);
 
       // Compute turbulance: Apply stencil
-
-      evolve9pt(un, uc, uo, pebble, n, row, col, indv, h, dt, t); // <-- This needs to change a bit
+      evolve9pt(un, uc, uo, pebble, n, rank, row, col, indv, h, dt, t);
 
       memcpy(uo, uc, sizeof(double) * n * n);
       memcpy(uc, un, sizeof(double) * n * n);
 
       if(!tpdt(&t,dt,end_time)) {
         printf("Done\n");
-        return 0;
+        break;
       }
     }
 
+    // Send final results to Rank 0.
+    MPI_Send(un, size, MPI_DOUBLE, 0, rank,  MPI_COMM_WORLD);
 
     // Initial node file
-    // char* s;
-    // s = (char*)malloc(sizeof(char)*20);
-    // int k = sprintf(s, "lake_node_%d.dat", rank);
-    // if (k>=0)
-    //   print_heatmap(s, un, npoints/2, h);
-    // else {
-    //   printf("Error in filename!\n");
-    //   return 0;
-    // }
+    char* s;
+    s = (char*)malloc(sizeof(char)*20);
+    int k = sprintf(s, "lake_node_%d.dat", rank);
+    if (k>=0)
+      print_heatmap(s, un, npoints/2, h);
+    else {
+      printf("Error in filename!\n");
+      return 0;
+    }
 
   }
   MPI_Finalize();
@@ -256,33 +264,6 @@ void transfer(double *from, double *to, int r, int n) {
   }
 }
 
-void run_cpu(double *u, double *u0, double *u1, double *pebbles, int n, double h, double end_time)
-{
-  double *un, *uc, *uo;
-  double t, dt;
-
-  un = (double*)malloc(sizeof(double) * n * n);
-  uc = (double*)malloc(sizeof(double) * n * n);
-  uo = (double*)malloc(sizeof(double) * n * n);
-
-  memcpy(uo, u0, sizeof(double) * n * n);
-  memcpy(uc, u1, sizeof(double) * n * n);
-  if(NINEPTSTENCIL)
-  {
-    evolve9pt(un, uc, uo, pebbles, n, h, dt, t);
-  }
-  else
-  {
-    evolve(un, uc, uo, pebbles, n, h, dt, t);
-  }
-  memcpy(uo, uc, sizeof(double) * n * n);
-  memcpy(uc, un, sizeof(double) * n * n);
-
-  // if(!tpdt(&t,dt,end_time)) break;
-
-  memcpy(u, un, sizeof(double) * n * n);
-}
-
 void init_pebbles(double *p, int pn, int n)
 {
   int i, j, k, idx;
@@ -349,7 +330,7 @@ void evolve(double *un, double *uc, double *uo, double *pebbles, int n, double h
   }
 }
 
-void evolve9pt(double *un, double *uc, double *uo, double *pebbles, int n, double *row, double *col, double *indv, double h, double dt, double t)
+void evolve9pt(double *un, double *uc, double *uo, double *pebbles, int n, int rank, double *row, double *col, double *indv, double h, double dt, double t)
 {
   int i, j, idx;
 
@@ -400,7 +381,7 @@ void evolve9pt(double *un, double *uc, double *uo, double *pebbles, int n, doubl
               un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + col[i] + uc[idx + n] + row[j] + 0.25*(uc[idx + n - 1] + col[i+1] + row[j-1] + *indv)- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
             }
             else if(j==n-1 && i>0) { // Left edge
-            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[i                 dx-1] + col[i] + uc[idx + n] + uc[idx - n] + 0.25*(uc[idx + n - 1] + col[i+1] + uc[idx - n - 1] + col[i-1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+            un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + col[i] + uc[idx + n] + uc[idx - n] + 0.25*(uc[idx + n - 1] + col[i+1] + uc[idx - n - 1] + col[i-1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
             }
             else if(i==0 && j<n-1) { // Top Edge
               un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + uc[idx+1] + uc[idx + n] + row[j] + 0.25*(uc[idx + n - 1] + uc[idx + n + 1] + row[j-1] + row[j+ 1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
