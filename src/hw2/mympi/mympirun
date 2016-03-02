@@ -1,0 +1,27 @@
+#! /bin/bash
+
+NP=$1
+NODEFILE=$PBS_O_WORKDIR/NODES
+CMD=$2
+CWD=${PWD}
+echo $CWD/$CMD 
+cat $PBS_NODEFILE > $CWD/NODES
+rank=0
+for curNode in `cat $NODEFILE`; do
+  ssh -n $curNode "killall -9 $CMD" &
+done
+
+for curNode in `cat $NODEFILE`; do
+  ssh -n $curNode "$CWD/$CMD $rank $NP" > OUT.$rank & pid[$rank]=$!
+  (( rank++ ))
+done
+# done for each item in nodefile, connect via ssh and run the cmd
+# the -n parameter is important or ssh will consume the rest 
+# iterate through the rank and node files
+
+#wait for each ssh / corresponding CMD
+rank=0
+for curNode in `cat $NODEFILE`; do
+  wait ${pid[$rank]}
+  (( rank++ ))
+done

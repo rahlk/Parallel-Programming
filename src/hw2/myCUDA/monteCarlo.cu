@@ -1,3 +1,6 @@
+/*
+rkrish11 Rahul Krishna
+*/
 #include "cuda.h"
 #include <curand.h>
 #include <curand_kernel.h>
@@ -8,13 +11,19 @@
 #include <string.h>
 #define SEED 35791246
 
-__global__ void init_stuff(curandState *state) {
+
+
+__global__ void init_stuff(curandState *state, int count) {
+// This sets a random number seed for all the threads
  int idx = blockIdx.x * blockDim.x + threadIdx.x;
- if (id<count) curand_init(1337, idx, 0, &state[idx]);
+ if (idx<count)
+  curand_init(1337, idx, 0, &state[idx]);
 }
 
 
-__global__ void cudaMonte(int* pi, int count, curandState* state) {
+__global__ void cudaMonte(double* pi, int count, curandState* state) {
+
+  // Perfome MC simulation on the threads
   int id=blockIdx.x*blockDim.x+threadIdx.x;
   double x,y,z;
 
@@ -27,6 +36,7 @@ __global__ void cudaMonte(int* pi, int count, curandState* state) {
   }
   __syncthreads();
 
+  // Find the total number of points that lie inside the quadrant of the cirle
   for (int i=1; i<count;i++) {
     pi[0]+=pi[i];
   }
@@ -35,13 +45,13 @@ __global__ void cudaMonte(int* pi, int count, curandState* state) {
 int main(int argc, char** argv) {
   int niter=0;
   double pi;
-  int* d_pi;
+  double* d_pi;
   curandState *d_state;
 
   printf("Enter the number of iterations used to estimate pi: ");
   scanf("%d",&niter);
 
-  int* h_pi = new int[niter];
+  double* h_pi = new double[niter];
 
   if (cudaMalloc(&d_pi, sizeof(int)*niter) != cudaSuccess) {
       printf("Error in memory allocation.\n");
@@ -57,7 +67,8 @@ int main(int argc, char** argv) {
       return 0;
   }
 
-  init_stuff<<<(int) niter/1024+1, 1024>>>(d_state);
+  // Number of threads = 1024, number of blocks = (int) (niter/threads)+1
+  init_stuff<<<(int) niter/1024+1, 1024>>>(d_state, niter);
   cudaMonte<<<(int) niter/1024+1, 1024>>>(d_pi, niter, d_state);
 
   if (cudaMemcpy (h_pi, d_pi, sizeof(int)*niter, cudaMemcpyDeviceToHost) != cudaSuccess) {
@@ -67,13 +78,8 @@ int main(int argc, char** argv) {
       return 0;
   }
 
+  // Final Estimate of pi
   pi= (double) h_pi[0]/niter*4;
   printf("# of trials= %d , estimate of pi is %g \n",niter,pi);
 
-  // for (int i=1;i<niter;i++) {
-  //   h_pi[0]+=h_pi[i];
-  // }
-  //
-  // pi= (double) h_pi[0]/niter*4;
-  // printf("# of trials= %d , estimate of pi is %g \n",niter,pi);
 }

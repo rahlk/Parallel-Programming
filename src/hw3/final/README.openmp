@@ -1,0 +1,83 @@
+/*
+*
+* Single Author Info:
+*
+* rkrish11 Rahul Krishna
+*
+*/
+
+Setup Information
+`````````````````
+
+
+Results
+```````
+
+./lake with (1024 x 1024) grid, until 2.000000, with 16 threads
+
+
+**All times are in seconds**
+
++--------------------------+
+|       16  Threads        |
++--------------------------+
+|       | Static | Dynamic |
++-------+--------+---------+
+| Inner | 99.98  | 594.32  |
++-------+--------+---------+
+| Outer | 59.86  | 59.06   |
++-------+--------+---------+
+Figure 1: Runtime for static/dynamic scheduler
+          with inner/outer loop parallelization.
+
+
++--------------------------+
+|        Baseline          |
++--------------------------+
+| Serial  |    254.99      |
++---------+----------------+
+Figure 2: Baseline runtime (Note: gcc with -O0 was used to obtain the score)
+
+
+Remarks
+```````
+
+1. Does the scheduling type matter? Why or why not?
+
+From the above results, it can be inferred that the scheduling strategy does
+have an impact. This, however, depends on the parallelization strategy
+undertaken. If we were to parallelize the inner thread, dynamic scheduling
+take  a lot longer than static.
+
+This, I believe, is due to the nature of scheduling. In static, we choose the
+next available thread to perform the computation in a round-robin manner.
+However, the dynamic scheduler a new value is assigned to a thread only when
+it's computations have completed.
+
+Although I expected dynamic to be slower, it was quite surprising to see the
+impact of inner loop parallelization.
+
+
+2. Does which loop you parallelized matter? Why or why not?
+
+Indeed. Which loop is parallelized does matter, as seen in figure 1. In general
+it is beneficial, runtime wise, to parallelize the outer loop than to
+parallelize the inner loop.
+
+In my opinion parallelizing only the inner loop makes the outer loop run
+serially. This takes away the essence of parallelization. If we parallelize the
+outer loop, every thread runs the inner loop thus having enough task to justify
+parallelization.
+
+3. This program is particularly easy to parallelize. Why?
+
+Well, there are several reasons:
+
+  a. The nature of the problem. With a set grid size N x N, every pixel needs 9
+  neighboring pixels and that's it. This is true of all other pixels (save the
+  boundaries, where there is no computation). This means, the pixels are
+  independent of each other in so far as the computations are concerned for
+  every time step.
+  b. Nested loops: Instead of having a single for loop, we use a nested loop
+  approach. This lets as farm out individual loops to threads, thereby providing
+  much better optimization.

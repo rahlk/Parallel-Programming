@@ -20,13 +20,14 @@
 void init(double *u, double *pebbles, int n);
 void evolve(double *un, double *uc, double *uo, double *pebbles, int n, double h, double dt, double t);
 void evolve9pt(double *un, double *uc, double *uo, double *pebbles, int n, int rank, double *row, double *col, double *indv, double h, double dt, double t);
+void evolve9pt_1(double *un, double *uc, double *uo, double *pebbles, int n, double h, double dt, double t);
 int tpdt(double *t, double dt, double end_time);
 void print_heatmap(char *filename, double *u, int n, double h);
 void init_pebbles(double *p, int pn, int n);
 
 void run_cpu(double *u, double *u0, double *u1, double *pebbles, int n, double h, double end_time);
 
-void transfer(double *from, double *to, int x_off, int y_off);
+void transfer(double *from, double *to, int r, int n, bool dir);
 void dest(double *source, double *row, double *col, double *indv, int *hor, int *ver, int *diag, int rank, int size);
 extern void run_gpu(double *u, double *u0, double *u1, double *pebbles, int n, double h, double end_time, int nthreads);
 
@@ -45,13 +46,18 @@ int main(int argc, char *argv[])
   MPI_Init(&argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &numproc);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Status *status;
+  MPI_Request *request;
+  request = (MPI_Request *) malloc(numproc * sizeof(MPI_Request));
+  status = (MPI_Status *) malloc(numproc * sizeof(MPI_Status));
 	// MPI_Get_processor_name(hostname, &len);
 
-  int     npoints   = 256;// atoi(argv[1]);
-  int     npebs     = 5;// atoi(argv[2]);
-  double  end_time  = 1.00;// (double)atof(argv[3]);
-  int     nthreads  = 1024;// atoi(argv[4]);
-  int 	  narea	    = npoints * npoints;
+  // These need to be dynamic
+  int     npoints   = 256;  // atoi(argv[1]);
+  int     npebs     = 3;    // atoi(argv[2]);
+  double  end_time  = 1.00; // (double)atof(argv[3]);
+  int     nthreads  = 1024; // atoi(argv[4]);
+  int 	  narea	    = npoints*npoints;
   bool    once      = true;
   int size=(npoints/2)*(npoints/2);
 
@@ -66,39 +72,72 @@ int main(int argc, char *argv[])
     double elapsed_cpu, elapsed_gpu;
     struct timeval cpu_start, cpu_end, gpu_start, gpu_end;
 
-    peb = (double*)malloc(sizeof(double) * size);
-    u_i0 = (double*)malloc(sizeof(double) * narea);
-    u_i1 = (double*)malloc(sizeof(double) * narea);
+    peb   = (double*)malloc(sizeof(double) * size);
+    u_i0  = (double*)malloc(sizeof(double) * narea);
+    u_i1  = (double*)malloc(sizeof(double) * narea);
     u_cpu = (double*)malloc(sizeof(double) * narea);
+    u_gpu = (double*)malloc(sizeof(double) * narea);
+    n_cpu = (double*)malloc(sizeof(double) * size);
 
-    if(once) {
-      pebs = (double*)malloc(sizeof(double) * narea);
-      printf("Rank0: Running a (%d x %d) grid, until %f, with %d threads\n", npoints, npoints, end_time, nthreads);
-      init_pebbles(pebs, npebs, npoints);
-      init(u_i0, pebs, npoints);
-      init(u_i1, pebs, npoints);
-      print_heatmap("lake_i.dat", u_i0, npoints, h);
+    pebs = (double*)malloc(sizeof(double) * narea);
+    printf("Rank0: Running a (%d x %d) grid, until %f, with %d threads\n", npoints, npoints, end_time, nthreads);
+    init_pebbles(pebs, npebs, npoints);
+    init(u_i0, pebs, npoints);
+    init(u_i1, pebs, npoints);
 
-      // Tranfer to MPI nodes
-      int i;
-      for (i=1; i<numproc; i++) {
-        transfer(pebs, peb, i, npoints); //get corresponding data
-        MPI_Send(peb,size, MPI_DOUBLE, i, i, MPI_COMM_WORLD);
-      }
-      once=false;
-    }
+    // /* Initial (Uncomment if required)*/
+    // run_cpu(u_gpu, u_i0, u_i1, pebs, npoints, h, end_time);
+    // print_heatmap("lake_cpu_f.dat", u_gpu, npoints, h);
 
-    // Reveive final lake from the cores
+    // Tranfer to MPI nodes
+    int i;
     for (i=1; i<numproc; i++) {
-      
-    }
+      transfer(pebs, peb, i, npoints, true); //get corresponding data
+      MPI_Send(peb,size, MPI_DOUBLE, i, i, MPI_COMM_WORLD);
+      }
+
+    /*-----------------------------------*/
+    /* Stitch individual nodes together */
+
+    MPI_Recv(n_cpu, size, MPI_DOUBLE, 1, 11, MPI_COMM_WORLD, &status[1]);
+    transfer(n_cpu, u_cpu, 1, npoints, false);
+
+    MPI_Recv(n_cpu, size, MPI_DOUBLE, 2, 12, MPI_COMM_WORLD, &status[2]);
+    transfer(n_cpu, u_cpu, 2, npoints, false);
+
+    MPI_Recv(n_cpu, size, MPI_DOUBLE, 3, 13, MPI_COMM_WORLD, &status[3]);
+    transfer(n_cpu, u_cpu, 3, npoints, false);
+
+    MPI_Recv(n_cpu, size, MPI_DOUBLE, 4, 14, MPI_COMM_WORLD, &status[4]);
+    transfer(n_cpu, u_cpu, 4, npoints, false);
+
+    // Save final Image
+    print_heatmap("lake_cpu_mpi.dat", u_cpu, npoints, h);
+
+    /*-----------------------------------*/
+
 
   }
 
   else {
-    MPI_Status status;
+    /*
 
-    // Sanity check
+    |``````````````````+|+````````````````|
+    |                  +|+                |
+    |                  +|+                |
+    |     Rank 1       +|+     Rank 2     |
+    |                  +|+                |
+    |++++++++++++++++++X|X++++++++++++++++|
+    |++++++++++++++++++X|X++++++++++++++++|
+    |                  +|+                |
+    |                  +|+                |
+    |     Rank 3       +|+     Rank 4     |
+    |                  +|+                |
+    |                  +|+                |
+    |                  +|+                |
+    ```````````````````````````````````````
+    */
+
     int number_amount;
     double *un, *u0, *u1, *pebble;
 
@@ -107,17 +146,20 @@ int main(int argc, char *argv[])
     un = (double*)malloc(sizeof(double) * (npoints/2)*(npoints/2));
     pebble = (double*)malloc(sizeof(double) * (npoints/2)*(npoints/2));
 
-    MPI_Recv(pebble, size, MPI_DOUBLE, 0, rank, MPI_COMM_WORLD, &status);
+    MPI_Recv(pebble, size, MPI_DOUBLE, 0, rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
+    /*---------------------------------*/
+    /* Sanity Check!*/ /*
     MPI_Get_count(&status, MPI_INT, &number_amount);
     printf("1 received %d numbers from 0. Message source = %d, "
            "tag = %d\n",
            number_amount, status.MPI_SOURCE, status.MPI_TAG);
+    /*---------------------------------*/
 
     init(u0, pebble, npoints/2);
     init(u1, pebble, npoints/2);
 
-    // begin timer
+    // Begin Timer
     t = 0.;
     dt = h / 2.;
     int n = npoints/2;
@@ -151,9 +193,9 @@ int main(int argc, char *argv[])
 
       // Compute turbulance: Receive neighbours
 
-      MPI_Recv(row,  npoints/2, MPI_DOUBLE, *hor,  *hor,  MPI_COMM_WORLD, &status);
-      MPI_Recv(col,  npoints/2, MPI_DOUBLE, *ver,  *ver,  MPI_COMM_WORLD, &status);
-      MPI_Recv(indv, 1, MPI_DOUBLE, *diag, *diag, MPI_COMM_WORLD, &status);
+      MPI_Recv(row,  npoints/2, MPI_DOUBLE, *hor,  *hor,  MPI_COMM_WORLD, &status[rank]);
+      MPI_Recv(col,  npoints/2, MPI_DOUBLE, *ver,  *ver,  MPI_COMM_WORLD, &status[rank]);
+      MPI_Recv(indv, 1, MPI_DOUBLE, *diag, *diag, MPI_COMM_WORLD, &status[rank]);
 
       // Compute turbulance: Apply stencil
       evolve9pt(un, uc, uo, pebble, n, rank, row, col, indv, h, dt, t);
@@ -162,13 +204,15 @@ int main(int argc, char *argv[])
       memcpy(uc, un, sizeof(double) * n * n);
 
       if(!tpdt(&t,dt,end_time)) {
-        printf("Done\n");
+        // printf("Done\n");
         break;
       }
     }
 
+    /*---------------------------------*/
     // Send final results to Rank 0.
-    MPI_Send(un, size, MPI_DOUBLE, 0, rank,  MPI_COMM_WORLD);
+    MPI_Isend(un, size, MPI_DOUBLE, 0, rank+10,  MPI_COMM_WORLD, &request[0]);
+    /*---------------------------------*/
 
     // Initial node file
     char* s;
@@ -178,6 +222,7 @@ int main(int argc, char *argv[])
       print_heatmap(s, un, npoints/2, h);
     else {
       printf("Error in filename!\n");
+      MPI_Finalize();
       return 0;
     }
 
@@ -239,8 +284,9 @@ void dest(double *source, double *row, double *col, double *indv, int *hor, int 
       break;
   }
 }
-void transfer(double *from, double *to, int r, int n) {
-  // This is really stupid. I'll change it...
+
+void transfer(double *from, double *to, int r, int n, bool dir) {
+  // This is really naive. I'll probably change it...
   int x,y, idx_t, idx_f;
   for (x=0; x<(int) n/2; x++)
   for (y=0; y<(int) n/2; y++) {
@@ -260,7 +306,10 @@ void transfer(double *from, double *to, int r, int n) {
       idx_t=x*n/2+y;
       idx_f=(x+n/2)*n+y+n/2;
     }
-    to[idx_t]=from[idx_f];
+    if (dir==true)
+      to[idx_t]=from[idx_f];
+    else
+      to[idx_f]=from[idx_t];
   }
 }
 
@@ -307,6 +356,35 @@ void init(double *u, double *pebbles, int n)
     }
   }
 }
+
+void run_cpu(double *u, double *u0, double *u1, double *pebbles, int n, double h, double end_time)
+{
+  double *un, *uc, *uo;
+  double t, dt;
+
+  un = (double*)malloc(sizeof(double) * n * n);
+  uc = (double*)malloc(sizeof(double) * n * n);
+  uo = (double*)malloc(sizeof(double) * n * n);
+
+  memcpy(uo, u0, sizeof(double) * n * n);
+  memcpy(uc, u1, sizeof(double) * n * n);
+
+  t = 0.;
+  dt = h / 2.;
+
+  while(1)
+  {
+
+    evolve9pt_1(un, uc, uo, pebbles, n, h, dt, t);
+    memcpy(uo, uc, sizeof(double) * n * n);
+    memcpy(uc, un, sizeof(double) * n * n);
+
+    if(!tpdt(&t,dt,end_time)) break;
+  }
+
+  memcpy(u, un, sizeof(double) * n * n);
+}
+
 
 void evolve(double *un, double *uc, double *uo, double *pebbles, int n, double h, double dt, double t)
 {
@@ -406,6 +484,29 @@ void evolve9pt(double *un, double *uc, double *uo, double *pebbles, int n, int r
       }
     }
 }
+
+void evolve9pt_1(double *un, double *uc, double *uo, double *pebbles, int n, double h, double dt, double t)
+{
+  int i, j, idx;
+
+  for( i = 0; i < n; i++)
+  {
+    for( j = 0; j < n; j++)
+    {
+      idx = j + i * n;
+
+      if( i == 0 || i == n - 1 || j == 0 || j == n - 1)
+      {
+        un[idx] = 0.;
+      }
+      else
+      {
+        un[idx] = 2*uc[idx] - uo[idx] + VSQR *(dt * dt) *((uc[idx-1] + uc[idx+1] + uc[idx + n] + uc[idx - n] + 0.25*(uc[idx + n - 1] + uc[idx + n + 1] + uc[idx - n - 1] + uc[idx - n + 1])- 5 * uc[idx])/(h * h) + f(pebbles[idx],t));
+      }
+    }
+  }
+}
+
 
 void print_heatmap(char *filename, double *u, int n, double h)
 {

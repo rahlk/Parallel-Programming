@@ -1,0 +1,10 @@
+running ./lake with (1024 x 1024) grid, until 2.000000, with 16 threads
+grid step size is 0.000977
+initializing pebbles
+initializing u0, u1
+printing initial configuration file
+beginning simulation
+
+Simulation took 232.038712 seconds
+printing final configuration file
+freeing memory

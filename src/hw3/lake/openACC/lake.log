@@ -1,0 +1,10 @@
+running ../openACC/lake with (512 x 512) grid, until 1.000000, with 1 threads
+grid step size is 0.001953
+initializing pebbles
+initializing u0, u1
+printing initial configuration file
+beginning simulation
+
+Simulation took 0.712944 seconds
+printing final configuration file
+freeing memory

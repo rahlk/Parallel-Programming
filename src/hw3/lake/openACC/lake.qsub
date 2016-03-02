@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# lake.qsub
+#
+# sets up the enviornment for running the 
+# LAKE simulation.
+#
+# set the WRKDIR directory to the location
+# of the lake binary before submitting.
+#
+
+#PBS -N lake_acc
+#PBS -l nodes=1,walltime=01:00:00
+#PBS -q default
+#PBS -o lake_acc.out
+#PBS -e lake_acc.err
+
+echo Running lake
+
+echo
+echo PBS JOB id is $PBS_JOBID
+echo PBS_NODEFILE is $PBS_NODEFILE
+echo PBS_QUEUE is $PBS_QUEUE
+NPROCS=`wc -l < $PBS_NODEFILE`
+echo
+
+hostname
+
+echo
+cat $PBS_NODEFILE
+echo NPROCS: $NPROCS
+
+WRKDIR=$HOME/hw3/lake
+
+GRIDSZ=256
+NPEBS=2
+STIME=1.0
+NTHREADS=1
+
+echo Running LAKE
+
+$WRKDIR/lake $GRIDSZ $NPEBS $STIME $NTHREADS
+
+echo LAKE completed without incident.  See logfile for run details.

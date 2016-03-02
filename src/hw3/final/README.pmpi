@@ -1,0 +1,19 @@
+/*
+*
+* Single Author Info:
+*
+* rkrish11 Rahul Krishna
+*
+*/
+
+Remarks on the results:
+
+1. I expect most communication to be focused along the diagonal. This makes sense to me because we are solving a Scalar Pentadiagonal Equation, the matrix is a pseudo diagonal Matrix and the best parallelization strategy my leverage this inherent diagonality. Looking at the output of the heatmap, this does seem to be the case.
+
+2. Additionally, since we are solving a PDE (partial differential equation), I expect there to be a lot of communication between the neighbors. After all, we are using numerical methods to approximate the PDEs. Additionally, because the matrix is a pseudo diagonal matrix, there may be communications with nodes that are not neighbors of each other. And, I expect there to be no communication with yourself (no surprises here).
+
+All the above tendencies were noticeable in the heatmap.
+
+3. As a final note, looking at the algorithm for solving scalar tridiagonal matrix (Thomas algorithm) and assuming that this SP benchmark is an extension of that, I expect there to be a constant number of communications on every node. And this should depend on the parallelization level.
+
+For 64 nodes, we have 3209 comms. per node for all nodes.

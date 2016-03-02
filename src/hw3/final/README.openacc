@@ -1,0 +1,148 @@
+/*
+*
+* Single Author Info:
+*
+* rkrish11 Rahul Krishna
+*
+*/
+
+Setup Information
+`````````````````
+
+
+Results
+```````
+
+**All times are in seconds**
+
+1. Naive OpenACC vs. Serial
+
++---------------+---------+
+|               | Runtime |
++---------------+---------+
+|    Serial     |  254.99 |
++---------------+---------+
+| Naive OpenACC |  363.27 |
++---------------+---------+
+Fig 1: 1024 x 1024 grid, 2 sec runtime
+
+
+
+2. Optimization: Serial vs. OpenACC
+
+./lake with (512 x 512) grid, until 4.000000, with 1 threads
+
++-----------+---------+-------------+
+|           | Runtime | Improvement |
++-----------+---------+-------------+
+| Serial    |  62.93  |      x 1    |
++-----------+---------+-------------+
+| Optimized |  1.42   |      x 44   |
++-----------+---------+-------------+
+Fig 2: 512 x 512 grid, 4 sec runtime
+
+
+
+3. OpenAcc Naive vs. OpenACC Optimized
+
+./lake with (1024 x 1024) grid, until 2.000000, with 1 threads
+
++-----------+---------+-------------+
+|           | Runtime | Improvement |
++-----------+---------+-------------+
+| Naive     | 363.27  |      x 1    |
++-----------+---------+-------------+
+| Optimized | 5.17    |      x 70   |
++-----------+---------+-------------+
+Fig 3: 1024 x 1024 grid, 2 sec runtime
+
+
+
+4. OpenMP 16-threads vs. OpenACC Optimized
+
+./lake with (1024 x 1024) grid, until 2.000000, with 1 threads
+
++-----------+---------+-------------+
+|           | Runtime | Improvement |
++-----------+---------+-------------+
+| OMP 16    | 59.86   |    x 1      |
++-----------+---------+-------------+
+| ACC Opt   | 5.17    |    x 11.5   |
++-----------+---------+-------------+
+
+
+Remarks
+```````
+
+1. The effect of the problem size:
+
+Smaller vs. Larger Grids:
+
+The effect of grid size is significant. The tables in figure 2 and figure 3 show that parallelizing a larger grid on the GPU produced a lot more speedup as compared to smaller ones.
+
+2. Short vs. Longer Simulation times:
+
+Simulation time doesn't seem to affect the speed up. This is reasonable because we can't parallelize that. The temporal nature makes it serial. This can be seen below, we notice a near constant speedup for 2, 4, and 6 units of runtime.
+
++------+--------+-----------+---------+
+| Time | Serial | Optimized | Speedup |
++------+--------+-----------+---------+
+| 2.0  | 31.66  | 0.597     | 53.03   |
++------+--------+-----------+---------+
+| 4.0  | 62.93  | 1.05      | 60      |
++------+--------+-----------+---------+
+| 6.0  | 102.72 | 1.93      | 53.22   |
++------+--------+-----------+---------+
+
+3. Where does the biggest optimization come from?
+
+A Naive optimization of the code, as expected is slower than the serial code (see fig 3). This is because the 2D wave equation is a memory bound operation. To see what happens we can set PGI_ACC_TIME=1.
+
+So, in the very naive implementation, we see a total of 6147 data transfers with copyin! This is very intensive. See Figure 5 below.
+
+````````````````````````````````````````````````````````````````````````````````
+221: compute region reached 2049 times
+    221: data copyin reached 6147 times
+         device time(us): total=8,907,857 max=1,503 min=1,447 avg=1,449
+    221: kernel launched 2049 times
+        grid: [1024]  block: [256]
+         device time(us): total=1,168,107 max=630 min=558 avg=570
+        elapsed time(us): total=1,187,962 max=652 min=568 avg=579
+    244: data copyout reached 2049 times
+         device time(us): total=2,646,979 max=1,306 min=1,288 avg=1,291
+244: compute region reached 2049 times
+    244: data copyin reached 4098 times
+         device time(us): total=5,938,679 max=1,503 min=1,448 avg=1,449
+    244: kernel launched 2049 times
+        grid: [1024]  block: [256]
+         device time(us): total=686,410 max=390 min=329 avg=334
+        elapsed time(us): total=706,259 max=409 min=338 avg=344
+    256: data copyout reached 4098 times
+         device time(us): total=5,291,602 max=1,351 min=1,288 avg=1,291
+````````````````````````````````````````````````````````````````````````````````
+Figure 5: PGI_ACC_TIME output for Naive OpenACC implementation.
+
+
+To tackle this, me can first copy all the necessary data to the device and let the device finish all the computations, and then copyout the vectors from the device to host. With this change, my optimized code has only 4 data copyin operations(see below at line 215).
+
+**Note: The 4 copies are for uc, uo, un, pebs.
+
+`````````````````````````````````````````````````````````````````````````````````
+`run_sim  NVIDIA  devicenum=0
+`  time(us): 1,866,097
+`  215: data region reached 1 time
+`      215: data copyin reached 4 times
+`           device time(us): total=5,815 max=1,465 min=1,449 avg=1,453
+`      259: data copyout reached 4 times
+`           device time(us): total=5,155 max=1,303 min=1,276 avg=1,288
+`  221: compute region reached 2049 times
+`      221: kernel launched 2049 times
+`          grid: [1024]  block: [256]
+`           device time(us): total=1,168,084 max=621 min=554 avg=570
+`          elapsed time(us): total=1,187,946 max=706 min=563 avg=579
+`  244: compute region reached 2049 times
+`      244: kernel launched 2049 times
+`          grid: [1024]  block: [256]
+`           device time(us): total=687,043 max=363 min=329 avg=335
+`          elapsed time(us): total=707,463 max=431 min=338 avg=345
+````````````````````````````````````````````````````````````````````````````````

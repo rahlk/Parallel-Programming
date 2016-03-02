@@ -1,0 +1,20 @@
+/*
+*
+* Single Author Info:
+*
+* rkrish11 Rahul Krishna
+*
+*/
+
+Setup Information
+`````````````````
+My code is optimized to run better on OpenMP under gcc. So please use:
+
+$ gcc -fopenmp -o lake lake.c -lm
+
+To run,
+
+./lake 1024 4 2 16
+
+Results
+```````
