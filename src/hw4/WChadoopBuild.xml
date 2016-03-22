@@ -3,7 +3,7 @@
       <property name="sourceDir" value="."/>
       <property name="outputDir" value="classes" />
       <property name="buildDir" value="jar" />
-      <property name="lib.dir"     value="/usr/lib/hadoop"/>
+      <property name="lib.dir"     value="$HADOOP_CLASSPATH"/>
 
       <path id="classpath">
         <fileset dir="${lib.dir}" includes="**/*.jar"/>
