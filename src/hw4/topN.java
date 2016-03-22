@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.lib.input.*;
 import org.apache.hadoop.mapreduce.lib.output.*;
 import org.apache.hadoop.util.*;
 
-public class WordCount extends Configured implements Tool {
+public class topN extends Configured implements Tool {
 
   public static void main(String args[]) throws Exception {
     // Get input arguments and make sure they are sufficient
@@ -23,7 +23,7 @@ public class WordCount extends Configured implements Tool {
     System.exit(3);
     }
     // Set up the driver class
-    int res = ToolRunner.run(new WordCount(), args);
+    int res = ToolRunner.run(new topN(), args);
     System.exit(res);
   }
 
@@ -45,7 +45,7 @@ public class WordCount extends Configured implements Tool {
     // Create a Job name for reference
     job.setJobName("WordCount");
     // Tell MapReduce what to look for in a executabe jar file
-    job.setJarByClass(WordCount.class);
+    job.setJarByClass(topN.class);
     //
     job.setInputFormatClass(TextInputFormat.class);
     job.setOutputFormatClass(TextOutputFormat.class);
