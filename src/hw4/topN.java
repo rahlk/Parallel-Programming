@@ -1,8 +1,5 @@
-package wc;
-
 import java.io.IOException;
 import java.util.*;
-
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.conf.*;
@@ -58,7 +55,7 @@ public class topN extends Configured implements Tool {
     job.setMapperClass(Map.class);
     job.setCombinerClass(Reduce.class);
     job.setReducerClass(Reduce.class);
-
+    job.setNumReduceTasks(3);
     // Return status to main
     return job.waitForCompletion(true) ? 0 : 1;
   }
