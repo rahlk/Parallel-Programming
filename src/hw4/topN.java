@@ -1,93 +1,179 @@
+package topN;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.GenericOptionsParser;
+
 import java.io.IOException;
 import java.util.*;
-import org.apache.hadoop.conf.*;
-import org.apache.hadoop.fs.*;
-import org.apache.hadoop.conf.*;
-import org.apache.hadoop.io.*;
-import org.apache.hadoop.mapreduce.*;
-import org.apache.hadoop.mapreduce.lib.input.*;
-import org.apache.hadoop.mapreduce.lib.output.*;
-import org.apache.hadoop.util.*;
-import com.google.common.collect.HashMultiset;
-public class topN extends Configured implements Tool {
 
-  public static void main(String args[]) throws Exception {
-    // Get input arguments and make sure they are sufficient
-    Configuration conf = new Configuration();
-    String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-    if (otherArgs.length != 3) {
-    System.err.println("Usage: TopWord <in> <out> <N>");
-    System.exit(3);
+/**
+ * Created with IntelliJ IDEA.
+ * User: rkrsn
+ * Date: 3/24/16
+ * Time: 2:19 AM
+ */
+public class topN {
+    public static void main(String[] args) throws Exception {
+        Configuration conf = new Configuration();
+        String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
+        if (otherArgs.length != 3) {
+            System.err.println("Usage: topN <in> <out> <N>");
+            System.exit(2);
+        }
+
+        // Set up the driver class
+        int res = ToolRunner.run(new topN(), args);
+        System.exit(res);
     }
-    // Set up the driver class
-    int res = ToolRunner.run(new topN(), args);
-    System.exit(res);
-  }
 
-  public int run(String[] args) throws Exception {
+    public int run(String[] args) throws Exception {
 
-    // Extract input and output path from cmdline args
-    Path inputPath = new Path(args[0]);
-    Path outputPath = new Path(args[1]);
+      // Extract input and output path from cmdline args
+      Path inputPath = new Path(args[0]);
+      Path outputPath = new Path(args[1]);
 
-    Configuration konf = getConf();
+      Configuration konf = getConf();
 
-    // Create a JobConf Object
-    Job job = new Job(konf, this.getClass().toString());
+      // Create a JobConf Object
+      Job job = new Job(konf, this.getClass().toString());
 
-    // Read the paths as an HDFS complient path
-    FileInputFormat.setInputPaths(job, inputPath);
-    FileOutputFormat.setOutputPath(job, outputPath);
+      // Read the paths as an HDFS complient path
+      FileInputFormat.setInputPaths(job, inputPath);
+      FileOutputFormat.setOutputPath(job, outputPath);
 
-    // Create a Job name for reference
-    job.setJobName("WordCount");
-    // Tell MapReduce what to look for in a executabe jar file
-    job.setJarByClass(topN.class);
-    //
-    job.setInputFormatClass(TextInputFormat.class);
-    job.setOutputFormatClass(TextOutputFormat.class);
-    // Tell Hadoop input/output key/value data type
-    job.setMapOutputKeyClass(Text.class);
-    job.setMapOutputValueClass(IntWritable.class);
-    job.setOutputKeyClass(Text.class);
-    job.setOutputValueClass(IntWritable.class);
-    // Set mapper and reducer classes
-    job.setMapperClass(Map.class);
-    job.setCombinerClass(Reduce.class);
-    job.setReducerClass(Reduce.class);
-    job.setNumReduceTasks(3);
-    // Return status to main
-    return job.waitForCompletion(true) ? 0 : 1;
-  }
-
-  public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
-
-    // Do a Hashmap based grouping
-    // Setup Hashmultiset
-    private final HashMultiset<String> wordCount = HashMultiset.create();
-
-    @Override
-    public void map(LongWritable key, Text value,
-                    Mapper.Context context) throws IOException, InterruptedException {
-
-      String[] tokens = value.toString().split("\\s+");
-      for (String token : tokens) {
-        wordCount.add(token);
-      }
+      // Create a Job name for reference
+      job.setJobName("WordCount");
+      // Tell MapReduce what to look for in a executabe jar file
+      job.setJarByClass(topN.class);
+      // Set N for future reference
+      job.set("topn", args[2]);
+      job.setInputFormatClass(TextInputFormat.class);
+      job.setOutputFormatClass(TextOutputFormat.class);
+      // Tell Hadoop input/output key/value data type
+      job.setMapOutputKeyClass(Text.class);
+      job.setMapOutputValueClass(IntWritable.class);
+      job.setOutputKeyClass(Text.class);
+      job.setOutputValueClass(IntWritable.class);
+      // Set mapper and reducer classes
+      job.setMapperClass(Map.class);
+      job.setCombinerClass(Reduce.class);
+      job.setReducerClass(Reduce.class);
+      job.setNumReduceTasks(3);
+      // Return status to main
+      return job.waitForCompletion(true) ? 0 : 1;
     }
-  }
 
-  public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
+    /**
+     * The mapper reads one line at the time, splits it into an array of single words and emits every
+     * word to the reducers with the value of 1.
+     */
+    public static class Map extends Mapper<Object, Text, Text, IntWritable> {
 
-    @Override
-    protected void cleanup(Context context) throws IOException, InterruptedException {
-      Text key= new Text();
-      IntWritable value = new IntWritable();
-      for (Entry<String> entry: wordCount.entrySet()) {
-        key.set(entry.getElement());
-        value.set(entry.getCount());
-        context.write(key, value);
-      }
+        private final static IntWritable one = new IntWritable(1);
+        private Text word = new Text();
+        private String tokens = "[_|$#<>\\^=\\[\\]\\*/\\\\,;,.\\-:()?!\"']";
+
+        @Override
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            String cleanLine = value.toString().toLowerCase().replaceAll(tokens, " ");
+            StringTokenizer itr = new StringTokenizer(cleanLine);
+            while (itr.hasMoreTokens()) {
+                word.set(itr.nextToken().trim());
+                context.write(word, one);
+            }
+        }
     }
-  }
+
+    /**
+     * The reducer retrieves every word and puts it into a Map: if the word already exists in the
+     * map, increments its value, otherwise sets it to 1.
+     */
+    public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
+
+        private Map<Text, IntWritable> countMap = new HashMap<>();
+        private static Long N;
+        N = Long.parseLong(job.get("topn"));
+
+        @Override
+        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+
+            // computes the number of occurrences of a single word
+            int sum = 0;
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+
+            // puts the number of occurrences of this word into the map.
+            // We need to create another Text object because the Text instance
+            // we receive is the same for all the words
+            countMap.put(new Text(key), new IntWritable(sum));
+        }
+
+        @Override
+        protected void cleanup(Context context) throws IOException, InterruptedException {
+
+            Map<Text, IntWritable> sortedMap = sortByValues(countMap);
+
+            int counter = 0;
+            for (Text key : sortedMap.keySet()) {
+                if (counter++ == N) {
+                    break;
+                }
+                context.write(key, sortedMap.get(key));
+            }
+        }
+    }
+
+    /**
+     * The combiner retrieves every word and puts it into a Map: if the word already exists in the
+     * map, increments its value, otherwise sets it to 1.
+     */
+    public static class TopNCombiner extends Reducer<Text, IntWritable, Text, IntWritable> {
+
+        @Override
+        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+
+            // computes the number of occurrences of a single word
+            int sum = 0;
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+            context.write(key, new IntWritable(sum));
+        }
+    }
+
+    /*
+   * sorts the map by values. Taken from:
+   * http://javarevisited.blogspot.it/2012/12/how-to-sort-hashmap-java-by-key-and-value.html
+   */
+    private static <K extends Comparable, V extends Comparable> Map<K, V> sortByValues(Map<K, V> map) {
+        List<Map.Entry<K, V>> entries = new LinkedList<Map.Entry<K, V>>(map.entrySet());
+
+        Collections.sort(entries, new Comparator<Map.Entry<K, V>>() {
+
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+
+        //LinkedHashMap will keep the keys in the order they are inserted
+        //which is currently sorted on natural ordering
+        Map<K, V> sortedMap = new LinkedHashMap<K, V>();
+
+        for (Map.Entry<K, V> entry : entries) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return sortedMap;
+    }
+
 }
