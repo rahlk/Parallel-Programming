@@ -1,5 +1,3 @@
-package topN;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -25,14 +23,16 @@ public class topN {
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-        if (otherArgs.length != 2) {
-            System.err.println("Usage: TopN <in> <out>");
+        if (otherArgs.length < 3) {
+            System.err.println("Usage: TopN <in> <out> <N>");
             System.exit(2);
         }
+        conf.set("N", otherArgs[2]);
         Job job = Job.getInstance(conf);
         job.setJobName("Top N");
-        job.setJarByClass(TopN.class);
+        job.setJarByClass(topN.class);
         job.setMapperClass(TopNMapper.class);
+        job.setNumReduceTasks(3);
         //job.setCombinerClass(TopNReducer.class);
         job.setReducerClass(TopNReducer.class);
         job.setOutputKeyClass(Text.class);
@@ -70,7 +70,6 @@ public class topN {
     public static class TopNReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
 
         private Map<Text, IntWritable> countMap = new HashMap<>();
-
         @Override
         public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
 
@@ -88,12 +87,13 @@ public class topN {
 
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-
+            
             Map<Text, IntWritable> sortedMap = sortByValues(countMap);
-
+            Configuration conf = context.getConfiguration();
+            int N = Integer.parseInt(conf.get("N"));
             int counter = 0;
             for (Text key : sortedMap.keySet()) {
-                if (counter++ == 20) {
+                if (counter++ == N) {
                     break;
                 }
                 context.write(key, sortedMap.get(key));
