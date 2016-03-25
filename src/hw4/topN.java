@@ -16,65 +16,37 @@ import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
- * User: rkrsn
- * Date: 3/24/16
- * Time: 2:19 AM
+ * User: andrea
+ * Date: 3/7/14
+ * Time: 9:19 AM
  */
 public class topN {
+
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-        if (otherArgs.length != 3) {
-            System.err.println("Usage: topN <in> <out> <N>");
+        if (otherArgs.length != 2) {
+            System.err.println("Usage: TopN <in> <out>");
             System.exit(2);
         }
-
-        // Set up the driver class
-        int res = ToolRunner.run(new topN(), args, conf);
-        System.exit(res);
-    }
-
-    public int run(String[] args, Configuration conf) throws Exception {
-
-      // Extract input and output path from cmdline args
-      Path inputPath = new Path(args[0]);
-      Path outputPath = new Path(args[1]);
-
-      Configuration konf = conf;
-
-      // Create a JobConf Object
-      konf.set("topn", args[2]);
-      Job job = new Job(konf, this.getClass().toString());
-      // Read the paths as an HDFS complient path
-      FileInputFormat.setInputPaths(job, inputPath);
-      FileOutputFormat.setOutputPath(job, outputPath);
-
-      // Create a Job name for reference
-      job.setJobName("WordCount");
-      // Tell MapReduce what to look for in a executabe jar file
-      job.setJarByClass(topN.class);
-      // Set N for future reference
-      job.setInputFormatClass(TextInputFormat.class);
-      job.setOutputFormatClass(TextOutputFormat.class);
-      // Tell Hadoop input/output key/value data type
-      job.setMapOutputKeyClass(Text.class);
-      job.setMapOutputValueClass(IntWritable.class);
-      job.setOutputKeyClass(Text.class);
-      job.setOutputValueClass(IntWritable.class);
-      // Set mapper and reducer classes
-      job.setMapperClass(Map.class);
-      job.setCombinerClass(Reduce.class);
-      job.setReducerClass(Reduce.class);
-      job.setNumReduceTasks(3);
-      // Return status to main
-      return job.waitForCompletion(true) ? 0 : 1;
+        Job job = Job.getInstance(conf);
+        job.setJobName("Top N");
+        job.setJarByClass(TopN.class);
+        job.setMapperClass(TopNMapper.class);
+        //job.setCombinerClass(TopNReducer.class);
+        job.setReducerClass(TopNReducer.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+        FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
+        FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 
     /**
      * The mapper reads one line at the time, splits it into an array of single words and emits every
      * word to the reducers with the value of 1.
      */
-    public static class Map extends Mapper<Object, Text, Text, IntWritable> {
+    public static class TopNMapper extends Mapper<Object, Text, Text, IntWritable> {
 
         private final static IntWritable one = new IntWritable(1);
         private Text word = new Text();
@@ -95,11 +67,9 @@ public class topN {
      * The reducer retrieves every word and puts it into a Map: if the word already exists in the
      * map, increments its value, otherwise sets it to 1.
      */
-    public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
+    public static class TopNReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
 
         private Map<Text, IntWritable> countMap = new HashMap<>();
-        Configuration conf = context.getConfiguration();
-        int N = conf.get("topn");
 
         @Override
         public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
@@ -123,7 +93,7 @@ public class topN {
 
             int counter = 0;
             for (Text key : sortedMap.keySet()) {
-                if (counter++ == N) {
+                if (counter++ == 20) {
                     break;
                 }
                 context.write(key, sortedMap.get(key));
