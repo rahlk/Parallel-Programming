@@ -8,7 +8,7 @@ import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.*;
 import org.apache.hadoop.mapreduce.lib.output.*;
 import org.apache.hadoop.util.*;
-import com.google.
+import com.google.common.collect.HashMultiset;
 public class topN extends Configured implements Tool {
 
   public static void main(String args[]) throws Exception {
@@ -72,7 +72,7 @@ public class topN extends Configured implements Tool {
 
       String[] tokens = value.toString().split("\\s+");
       for (String token : tokens) {
-        wordCount.add(token)
+        wordCount.add(token);
       }
     }
   }
@@ -82,8 +82,8 @@ public class topN extends Configured implements Tool {
     @Override
     protected void cleanup(Context context) throws IOException, InterruptedException {
       Text key= new Text();
-      LongWritable value = new LongWritable();
-      for (Entry<String> entry: wordCountSet.entrySet()) {
+      IntWritable value = new IntWritable();
+      for (Entry<String> entry: wordCount.entrySet()) {
         key.set(entry.getElement());
         value.set(entry.getCount());
         context.write(key, value);
