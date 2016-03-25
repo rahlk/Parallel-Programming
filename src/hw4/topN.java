@@ -8,7 +8,7 @@ import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.*;
 import org.apache.hadoop.mapreduce.lib.output.*;
 import org.apache.hadoop.util.*;
-
+import com.google.
 public class topN extends Configured implements Tool {
 
   public static void main(String args[]) throws Exception {
@@ -61,17 +61,18 @@ public class topN extends Configured implements Tool {
   }
 
   public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
-    private final static IntWritable one = new IntWritable(1);
-    private Text word = new Text();
+
+    // Do a Hashmap based grouping
+    // Setup Hashmultiset
+    private final HashMultiset<String> wordCount = HashMultiset.create();
 
     @Override
     public void map(LongWritable key, Text value,
                     Mapper.Context context) throws IOException, InterruptedException {
-      String line = value.toString();
-      StringTokenizer tokenizer = new StringTokenizer(line);
-      while (tokenizer.hasMoreTokens()) {
-        word.set(tokenizer.nextToken());
-        context.write(word, one);
+
+      String[] tokens = value.toString().split("\\s+");
+      for (String token : tokens) {
+        wordCount.add(token)
       }
     }
   }
@@ -79,14 +80,14 @@ public class topN extends Configured implements Tool {
   public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
 
     @Override
-    public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-      int sum = 0;
-      for (IntWritable value : values) {
-        sum += value.get();
+    protected void cleanup(Context context) throws IOException, InterruptedException {
+      Text key= new Text();
+      LongWritable value = new LongWritable();
+      for (Entry<String> entry: wordCountSet.entrySet()) {
+        key.set(entry.getElement());
+        value.set(entry.getCount());
+        context.write(key, value);
       }
-
-      context.write(key, new IntWritable(sum));
     }
   }
-
 }
