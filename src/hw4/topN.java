@@ -30,21 +30,21 @@ public class topN {
         }
 
         // Set up the driver class
-        int res = ToolRunner.run(new topN(), args);
+        int res = ToolRunner.run(new topN(), args, conf);
         System.exit(res);
     }
 
-    public int run(String[] args) throws Exception {
+    public int run(String[] args, Configuration conf) throws Exception {
 
       // Extract input and output path from cmdline args
       Path inputPath = new Path(args[0]);
       Path outputPath = new Path(args[1]);
 
-      Configuration konf = getConf();
+      Configuration konf = conf;
 
       // Create a JobConf Object
+      konf.set("topn", args[2]);
       Job job = new Job(konf, this.getClass().toString());
-
       // Read the paths as an HDFS complient path
       FileInputFormat.setInputPaths(job, inputPath);
       FileOutputFormat.setOutputPath(job, outputPath);
@@ -54,7 +54,6 @@ public class topN {
       // Tell MapReduce what to look for in a executabe jar file
       job.setJarByClass(topN.class);
       // Set N for future reference
-      job.set("topn", args[2]);
       job.setInputFormatClass(TextInputFormat.class);
       job.setOutputFormatClass(TextOutputFormat.class);
       // Tell Hadoop input/output key/value data type
@@ -99,8 +98,8 @@ public class topN {
     public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
 
         private Map<Text, IntWritable> countMap = new HashMap<>();
-        private static Long N;
-        N = Long.parseLong(job.get("topn"));
+        Configuration conf = context.getConfiguration();
+        int N = conf.get("topn");
 
         @Override
         public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
