@@ -84,7 +84,7 @@ int main(int argc, char** argv)
   char* input_file = NULL;
   int ghost_newton = 1;
   int sort = -1;
-  int Events[NUM_EVENTS] = {PAPI_RES_STL, PAPI_STL_ICY};
+  int Events[NUM_EVENTS] = {PAPI_RES_STL, PAPI_STL_ICY}; // PAPI_RES_STL: Cycles stalled; PAPI_STL_ICY: Cycles with no instructions issued.
   long_long values[NUM_EVENTS];
 
   int num_hwcntrs = 0;
@@ -494,10 +494,10 @@ int main(int argc, char** argv)
            1.0 * natoms * integrate.ntimes / timer.array[TIME_TOTAL], 1.0 * natoms * integrate.ntimes / timer.array[TIME_TOTAL] / nprocs / num_threads, timer.array[TIME_TEST]);
 #endif
 
-    printf("# No. MPI proc:%i \n", nprocs);
+    printf("# No. MPI proc:    %i \n", nprocs);
     printf("# No. OMP threads: %i\n", num_threads);
-    printf("# Total time: %lf seconds\n", timer.array[TIME_TOTAL]);
-    printf("# problem size: %dx%dx%d\n", in.nx, in.ny, in.nz);
+    printf("# Total time:      %lf seconds\n", timer.array[TIME_TOTAL]);
+    printf("# problem size:    %dx%dx%d\n", in.nx, in.ny, in.nz);
   }
   if(yaml_output)
     output(in, atom, force, neighbor, comm, thermo, integrate, timer, screen_yaml);
@@ -511,11 +511,12 @@ int main(int argc, char** argv)
     exit(0);
   }
 
-  if(me==0)
+  if(me==0) {
     std::cout << "# PAPI Report" << std::endl;
+    std::cout << "Rank Stall No_Instructions" << std::endl;
+  }
 
-  std::cout <<"Rank " << me << " PAPI_RES_STL "<< values[0] << std::endl;
-  std::cout <<"Rank " << me << " PAPI_STL_ICL "<< values[1] << std::endl;
+  std::cout << me <<" "<< values[0] <<" "<< values[1] << std::endl;
 
   MPI_Finalize();
   return 0;
