@@ -1,0 +1,51 @@
+# Create System:
+# Done .... 
+# miniMD-Reference 1.2 (MPI+OpenMP) output ...
+# Run Settings: 
+	# MPI processes: 3
+	# OpenMP threads: 1
+	# Inputfile: in.lj.miniMD
+	# Datafile: None
+# Physics Settings: 
+	# ForceStyle: LJ
+	# Force Parameters: 1.00 1.00
+	# Units: LJ
+	# Atoms: 131072
+	# System size: 53.75 53.75 53.75 (unit cells: 32 32 32)
+	# Density: 0.844200
+	# Force cutoff: 2.500000
+	# Timestep size: 0.005000
+# Technical Settings: 
+	# Neigh cutoff: 2.800000
+	# Half neighborlists: 1
+	# Neighbor bins: 26 26 26
+	# Neighbor frequency: 20
+	# Sorting frequency: 20
+	# Thermo frequency: 100
+	# Ghost Newton: 1
+	# Use intrinsics: 0
+	# Do safe exchange: 0
+	# Size of float: 8
+
+# Starting dynamics ...
+# Timestep T U P Time
+0 1.440000e+00 -6.773368e+00 -5.019679e+00  0.000
+100 8.200911e-01 -5.852702e+00 -1.873921e-01  6.677
+200 7.961535e-01 -5.816327e+00 -6.868325e-02 13.283
+300 7.696508e-01 -5.776549e+00 1.234609e-01 19.893
+400 7.708161e-01 -5.778761e+00 1.279987e-01 26.487
+500 7.606938e-01 -5.763822e+00 2.414134e-01 33.080
+
+
+# Performance Summary:
+# No. MPI proc:    3 
+# No. OMP threads: 1
+# Total time:      33.080090 seconds
+# problem size:    32x32x32
+# PAPI Report
+Rank 0 PAPI_RES_STL 36990527164
+Rank 0 PAPI_STL_ICL 3048485459
+Rank 2 PAPI_RES_STL 36921508527
+Rank 2 PAPI_STL_ICL 3064573964
+Rank 1 PAPI_RES_STL 36892259194
+Rank 1 PAPI_STL_ICL 3035602063
