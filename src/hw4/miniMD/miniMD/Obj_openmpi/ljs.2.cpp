@@ -39008,7 +39008,1415 @@ MPI::File::Call_errhandler(int errorcode) const
 # 301 "/usr/mpi/gcc/openmpi-1.5.4/include/openmpi/ompi/mpi/cxx/mpicxx.h" 2
 # 2088 "/usr/mpi/gcc/openmpi-1.5.4/include/mpi.h" 2
 # 35 "ljs.cpp" 2
+# 1 "/usr/local/include/papi.h" 1 3
+# 229 "/usr/local/include/papi.h" 3
+extern "C"
+{
 
+
+
+
+
+# 1 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/include/limits.h" 1 3 4
+# 237 "/usr/local/include/papi.h" 2 3
+# 1 "/usr/local/include/papiStdEventDefs.h" 1 3
+# 47 "/usr/local/include/papiStdEventDefs.h" 3
+enum
+{
+ PAPI_L1_DCM_idx = 0,
+ PAPI_L1_ICM_idx,
+ PAPI_L2_DCM_idx,
+ PAPI_L2_ICM_idx,
+ PAPI_L3_DCM_idx,
+ PAPI_L3_ICM_idx,
+ PAPI_L1_TCM_idx,
+ PAPI_L2_TCM_idx,
+ PAPI_L3_TCM_idx,
+ PAPI_CA_SNP_idx,
+ PAPI_CA_SHR_idx,
+ PAPI_CA_CLN_idx,
+ PAPI_CA_INV_idx,
+ PAPI_CA_ITV_idx,
+ PAPI_L3_LDM_idx,
+ PAPI_L3_STM_idx,
+
+ PAPI_BRU_IDL_idx,
+ PAPI_FXU_IDL_idx,
+ PAPI_FPU_IDL_idx,
+ PAPI_LSU_IDL_idx,
+ PAPI_TLB_DM_idx,
+ PAPI_TLB_IM_idx,
+ PAPI_TLB_TL_idx,
+ PAPI_L1_LDM_idx,
+ PAPI_L1_STM_idx,
+ PAPI_L2_LDM_idx,
+ PAPI_L2_STM_idx,
+ PAPI_BTAC_M_idx,
+ PAPI_PRF_DM_idx,
+ PAPI_L3_DCH_idx,
+ PAPI_TLB_SD_idx,
+ PAPI_CSR_FAL_idx,
+
+ PAPI_CSR_SUC_idx,
+ PAPI_CSR_TOT_idx,
+ PAPI_MEM_SCY_idx,
+ PAPI_MEM_RCY_idx,
+ PAPI_MEM_WCY_idx,
+ PAPI_STL_ICY_idx,
+ PAPI_FUL_ICY_idx,
+ PAPI_STL_CCY_idx,
+ PAPI_FUL_CCY_idx,
+ PAPI_HW_INT_idx,
+ PAPI_BR_UCN_idx,
+ PAPI_BR_CN_idx,
+ PAPI_BR_TKN_idx,
+ PAPI_BR_NTK_idx,
+ PAPI_BR_MSP_idx,
+ PAPI_BR_PRC_idx,
+
+ PAPI_FMA_INS_idx,
+ PAPI_TOT_IIS_idx,
+ PAPI_TOT_INS_idx,
+ PAPI_INT_INS_idx,
+ PAPI_FP_INS_idx,
+ PAPI_LD_INS_idx,
+ PAPI_SR_INS_idx,
+ PAPI_BR_INS_idx,
+ PAPI_VEC_INS_idx,
+ PAPI_RES_STL_idx,
+ PAPI_FP_STAL_idx,
+ PAPI_TOT_CYC_idx,
+ PAPI_LST_INS_idx,
+ PAPI_SYC_INS_idx,
+ PAPI_L1_DCH_idx,
+ PAPI_L2_DCH_idx,
+
+ PAPI_L1_DCA_idx,
+ PAPI_L2_DCA_idx,
+ PAPI_L3_DCA_idx,
+ PAPI_L1_DCR_idx,
+ PAPI_L2_DCR_idx,
+ PAPI_L3_DCR_idx,
+ PAPI_L1_DCW_idx,
+ PAPI_L2_DCW_idx,
+ PAPI_L3_DCW_idx,
+ PAPI_L1_ICH_idx,
+ PAPI_L2_ICH_idx,
+ PAPI_L3_ICH_idx,
+ PAPI_L1_ICA_idx,
+ PAPI_L2_ICA_idx,
+ PAPI_L3_ICA_idx,
+ PAPI_L1_ICR_idx,
+
+ PAPI_L2_ICR_idx,
+ PAPI_L3_ICR_idx,
+ PAPI_L1_ICW_idx,
+ PAPI_L2_ICW_idx,
+ PAPI_L3_ICW_idx,
+ PAPI_L1_TCH_idx,
+ PAPI_L2_TCH_idx,
+ PAPI_L3_TCH_idx,
+ PAPI_L1_TCA_idx,
+ PAPI_L2_TCA_idx,
+ PAPI_L3_TCA_idx,
+ PAPI_L1_TCR_idx,
+ PAPI_L2_TCR_idx,
+ PAPI_L3_TCR_idx,
+ PAPI_L1_TCW_idx,
+ PAPI_L2_TCW_idx,
+
+ PAPI_L3_TCW_idx,
+ PAPI_FML_INS_idx,
+ PAPI_FAD_INS_idx,
+ PAPI_FDV_INS_idx,
+ PAPI_FSQ_INS_idx,
+ PAPI_FNV_INS_idx,
+ PAPI_FP_OPS_idx,
+ PAPI_SP_OPS_idx,
+ PAPI_DP_OPS_idx,
+ PAPI_VEC_SP_idx,
+ PAPI_VEC_DP_idx,
+ PAPI_REF_CYC_idx,
+ PAPI_END_idx
+};
+# 238 "/usr/local/include/papi.h" 2 3
+# 472 "/usr/local/include/papi.h" 3
+enum {
+   PAPI_ENUM_EVENTS = 0,
+   PAPI_ENUM_FIRST,
+   PAPI_PRESET_ENUM_AVAIL,
+
+
+   PAPI_PRESET_ENUM_MSC,
+   PAPI_PRESET_ENUM_INS,
+   PAPI_PRESET_ENUM_IDL,
+   PAPI_PRESET_ENUM_BR,
+   PAPI_PRESET_ENUM_CND,
+   PAPI_PRESET_ENUM_MEM,
+   PAPI_PRESET_ENUM_CACH,
+   PAPI_PRESET_ENUM_L1,
+   PAPI_PRESET_ENUM_L2,
+   PAPI_PRESET_ENUM_L3,
+   PAPI_PRESET_ENUM_TLB,
+   PAPI_PRESET_ENUM_FP,
+
+
+   PAPI_NTV_ENUM_UMASKS,
+   PAPI_NTV_ENUM_UMASK_COMBOS,
+   PAPI_NTV_ENUM_IARR,
+   PAPI_NTV_ENUM_DARR,
+   PAPI_NTV_ENUM_OPCM,
+   PAPI_NTV_ENUM_IEAR,
+   PAPI_NTV_ENUM_DEAR,
+   PAPI_NTV_ENUM_GROUPS
+};
+# 536 "/usr/local/include/papi.h" 3
+# 1 "/usr/include/signal.h" 1 3 4
+# 31 "/usr/include/signal.h" 3 4
+extern "C" {
+
+# 1 "/usr/include/bits/sigset.h" 1 3 4
+# 103 "/usr/include/bits/sigset.h" 3 4
+extern int __sigismember (__const __sigset_t *, int);
+extern int __sigaddset (__sigset_t *, int);
+extern int __sigdelset (__sigset_t *, int);
+# 117 "/usr/include/bits/sigset.h" 3 4
+extern __inline int __sigismember (__const __sigset_t *__set, int __sig) { unsigned long int __mask = (((unsigned long int) 1) << (((__sig) - 1) % (8 * sizeof (unsigned long int)))); unsigned long int __word = (((__sig) - 1) / (8 * sizeof (unsigned long int))); return (__set->__val[__word] & __mask) ? 1 : 0; }
+extern __inline int __sigaddset ( __sigset_t *__set, int __sig) { unsigned long int __mask = (((unsigned long int) 1) << (((__sig) - 1) % (8 * sizeof (unsigned long int)))); unsigned long int __word = (((__sig) - 1) / (8 * sizeof (unsigned long int))); return ((__set->__val[__word] |= __mask), 0); }
+extern __inline int __sigdelset ( __sigset_t *__set, int __sig) { unsigned long int __mask = (((unsigned long int) 1) << (((__sig) - 1) % (8 * sizeof (unsigned long int)))); unsigned long int __word = (((__sig) - 1) / (8 * sizeof (unsigned long int))); return ((__set->__val[__word] &= ~__mask), 0); }
+# 34 "/usr/include/signal.h" 2 3 4
+
+
+
+
+
+
+
+typedef __sig_atomic_t sig_atomic_t;
+
+# 58 "/usr/include/signal.h" 3 4
+# 1 "/usr/include/bits/signum.h" 1 3 4
+# 59 "/usr/include/signal.h" 2 3 4
+# 75 "/usr/include/signal.h" 3 4
+typedef void (*__sighandler_t) (int);
+
+
+
+
+extern __sighandler_t __sysv_signal (int __sig, __sighandler_t __handler)
+     throw ();
+
+extern __sighandler_t sysv_signal (int __sig, __sighandler_t __handler)
+     throw ();
+
+
+
+
+
+
+
+extern __sighandler_t signal (int __sig, __sighandler_t __handler)
+     throw ();
+# 104 "/usr/include/signal.h" 3 4
+
+
+
+
+
+extern __sighandler_t bsd_signal (int __sig, __sighandler_t __handler)
+     throw ();
+
+
+
+
+
+
+extern int kill (__pid_t __pid, int __sig) throw ();
+
+
+
+
+
+
+extern int killpg (__pid_t __pgrp, int __sig) throw ();
+
+
+
+
+extern int raise (int __sig) throw ();
+
+
+
+
+extern __sighandler_t ssignal (int __sig, __sighandler_t __handler)
+     throw ();
+extern int gsignal (int __sig) throw ();
+
+
+
+
+extern void psignal (int __sig, __const char *__s);
+# 153 "/usr/include/signal.h" 3 4
+extern int __sigpause (int __sig_or_mask, int __is_sig);
+# 162 "/usr/include/signal.h" 3 4
+extern int sigpause (int __sig) __asm__ ("__xpg_sigpause");
+# 181 "/usr/include/signal.h" 3 4
+extern int sigblock (int __mask) throw () __attribute__ ((__deprecated__));
+
+
+extern int sigsetmask (int __mask) throw () __attribute__ ((__deprecated__));
+
+
+extern int siggetmask (void) throw () __attribute__ ((__deprecated__));
+# 196 "/usr/include/signal.h" 3 4
+typedef __sighandler_t sighandler_t;
+
+
+
+
+typedef __sighandler_t sig_t;
+# 212 "/usr/include/signal.h" 3 4
+# 1 "/usr/include/bits/siginfo.h" 1 3 4
+# 25 "/usr/include/bits/siginfo.h" 3 4
+# 1 "/usr/include/bits/wordsize.h" 1 3 4
+# 26 "/usr/include/bits/siginfo.h" 2 3 4
+
+
+
+
+
+
+
+typedef union sigval
+  {
+    int sival_int;
+    void *sival_ptr;
+  } sigval_t;
+# 51 "/usr/include/bits/siginfo.h" 3 4
+typedef struct siginfo
+  {
+    int si_signo;
+    int si_errno;
+
+    int si_code;
+
+    union
+      {
+ int _pad[((128 / sizeof (int)) - 4)];
+
+
+ struct
+   {
+     __pid_t si_pid;
+     __uid_t si_uid;
+   } _kill;
+
+
+ struct
+   {
+     int si_tid;
+     int si_overrun;
+     sigval_t si_sigval;
+   } _timer;
+
+
+ struct
+   {
+     __pid_t si_pid;
+     __uid_t si_uid;
+     sigval_t si_sigval;
+   } _rt;
+
+
+ struct
+   {
+     __pid_t si_pid;
+     __uid_t si_uid;
+     int si_status;
+     __clock_t si_utime;
+     __clock_t si_stime;
+   } _sigchld;
+
+
+ struct
+   {
+     void *si_addr;
+   } _sigfault;
+
+
+ struct
+   {
+     long int si_band;
+     int si_fd;
+   } _sigpoll;
+      } _sifields;
+  } siginfo_t;
+# 129 "/usr/include/bits/siginfo.h" 3 4
+enum
+{
+  SI_ASYNCNL = -60,
+
+  SI_TKILL = -6,
+
+  SI_SIGIO,
+
+  SI_ASYNCIO,
+
+  SI_MESGQ,
+
+  SI_TIMER,
+
+  SI_QUEUE,
+
+  SI_USER,
+
+  SI_KERNEL = 0x80
+
+};
+
+
+
+enum
+{
+  ILL_ILLOPC = 1,
+
+  ILL_ILLOPN,
+
+  ILL_ILLADR,
+
+  ILL_ILLTRP,
+
+  ILL_PRVOPC,
+
+  ILL_PRVREG,
+
+  ILL_COPROC,
+
+  ILL_BADSTK
+
+};
+
+
+enum
+{
+  FPE_INTDIV = 1,
+
+  FPE_INTOVF,
+
+  FPE_FLTDIV,
+
+  FPE_FLTOVF,
+
+  FPE_FLTUND,
+
+  FPE_FLTRES,
+
+  FPE_FLTINV,
+
+  FPE_FLTSUB
+
+};
+
+
+enum
+{
+  SEGV_MAPERR = 1,
+
+  SEGV_ACCERR
+
+};
+
+
+enum
+{
+  BUS_ADRALN = 1,
+
+  BUS_ADRERR,
+
+  BUS_OBJERR
+
+};
+
+
+enum
+{
+  TRAP_BRKPT = 1,
+
+  TRAP_TRACE
+
+};
+
+
+enum
+{
+  CLD_EXITED = 1,
+
+  CLD_KILLED,
+
+  CLD_DUMPED,
+
+  CLD_TRAPPED,
+
+  CLD_STOPPED,
+
+  CLD_CONTINUED
+
+};
+
+
+enum
+{
+  POLL_IN = 1,
+
+  POLL_OUT,
+
+  POLL_MSG,
+
+  POLL_ERR,
+
+  POLL_PRI,
+
+  POLL_HUP
+
+};
+# 273 "/usr/include/bits/siginfo.h" 3 4
+typedef struct sigevent
+  {
+    sigval_t sigev_value;
+    int sigev_signo;
+    int sigev_notify;
+
+    union
+      {
+ int _pad[((64 / sizeof (int)) - 4)];
+
+
+
+ __pid_t _tid;
+
+ struct
+   {
+     void (*_function) (sigval_t);
+     void *_attribute;
+   } _sigev_thread;
+      } _sigev_un;
+  } sigevent_t;
+
+
+
+
+
+
+enum
+{
+  SIGEV_SIGNAL = 0,
+
+  SIGEV_NONE,
+
+  SIGEV_THREAD,
+
+
+  SIGEV_THREAD_ID = 4
+
+};
+# 213 "/usr/include/signal.h" 2 3 4
+
+
+
+extern int sigemptyset (sigset_t *__set) throw () __attribute__ ((__nonnull__ (1)));
+
+
+extern int sigfillset (sigset_t *__set) throw () __attribute__ ((__nonnull__ (1)));
+
+
+extern int sigaddset (sigset_t *__set, int __signo) throw () __attribute__ ((__nonnull__ (1)));
+
+
+extern int sigdelset (sigset_t *__set, int __signo) throw () __attribute__ ((__nonnull__ (1)));
+
+
+extern int sigismember (__const sigset_t *__set, int __signo)
+     throw () __attribute__ ((__nonnull__ (1)));
+
+
+
+extern int sigisemptyset (__const sigset_t *__set) throw () __attribute__ ((__nonnull__ (1)));
+
+
+extern int sigandset (sigset_t *__set, __const sigset_t *__left,
+        __const sigset_t *__right) throw () __attribute__ ((__nonnull__ (1, 2, 3)));
+
+
+extern int sigorset (sigset_t *__set, __const sigset_t *__left,
+       __const sigset_t *__right) throw () __attribute__ ((__nonnull__ (1, 2, 3)));
+
+
+
+
+# 1 "/usr/include/bits/sigaction.h" 1 3 4
+# 25 "/usr/include/bits/sigaction.h" 3 4
+struct sigaction
+  {
+
+
+    union
+      {
+
+ __sighandler_t sa_handler;
+
+ void (*sa_sigaction) (int, siginfo_t *, void *);
+      }
+    __sigaction_handler;
+
+
+
+
+
+
+
+    __sigset_t sa_mask;
+
+
+    int sa_flags;
+
+
+    void (*sa_restorer) (void);
+  };
+# 247 "/usr/include/signal.h" 2 3 4
+
+
+extern int sigprocmask (int __how, __const sigset_t *__restrict __set,
+   sigset_t *__restrict __oset) throw ();
+
+
+
+
+
+
+extern int sigsuspend (__const sigset_t *__set) __attribute__ ((__nonnull__ (1)));
+
+
+extern int sigaction (int __sig, __const struct sigaction *__restrict __act,
+        struct sigaction *__restrict __oact) throw ();
+
+
+extern int sigpending (sigset_t *__set) throw () __attribute__ ((__nonnull__ (1)));
+
+
+
+
+
+
+extern int sigwait (__const sigset_t *__restrict __set, int *__restrict __sig)
+     __attribute__ ((__nonnull__ (1, 2)));
+
+
+
+
+
+
+extern int sigwaitinfo (__const sigset_t *__restrict __set,
+   siginfo_t *__restrict __info) __attribute__ ((__nonnull__ (1)));
+
+
+
+
+
+
+extern int sigtimedwait (__const sigset_t *__restrict __set,
+    siginfo_t *__restrict __info,
+    __const struct timespec *__restrict __timeout)
+     __attribute__ ((__nonnull__ (1)));
+
+
+
+extern int sigqueue (__pid_t __pid, int __sig, __const union sigval __val)
+     throw ();
+# 304 "/usr/include/signal.h" 3 4
+extern __const char *__const _sys_siglist[65];
+extern __const char *__const sys_siglist[65];
+
+
+struct sigvec
+  {
+    __sighandler_t sv_handler;
+    int sv_mask;
+
+    int sv_flags;
+
+  };
+# 328 "/usr/include/signal.h" 3 4
+extern int sigvec (int __sig, __const struct sigvec *__vec,
+     struct sigvec *__ovec) throw ();
+
+
+
+# 1 "/usr/include/bits/sigcontext.h" 1 3 4
+# 26 "/usr/include/bits/sigcontext.h" 3 4
+# 1 "/usr/include/bits/wordsize.h" 1 3 4
+# 27 "/usr/include/bits/sigcontext.h" 2 3 4
+
+struct _fpreg
+{
+  unsigned short significand[4];
+  unsigned short exponent;
+};
+
+struct _fpxreg
+{
+  unsigned short significand[4];
+  unsigned short exponent;
+  unsigned short padding[3];
+};
+
+struct _xmmreg
+{
+  __uint32_t element[4];
+};
+# 109 "/usr/include/bits/sigcontext.h" 3 4
+struct _fpstate
+{
+
+  __uint16_t cwd;
+  __uint16_t swd;
+  __uint16_t ftw;
+  __uint16_t fop;
+  __uint64_t rip;
+  __uint64_t rdp;
+  __uint32_t mxcsr;
+  __uint32_t mxcr_mask;
+  struct _fpxreg _st[8];
+  struct _xmmreg _xmm[16];
+  __uint32_t padding[24];
+};
+
+struct sigcontext
+{
+  unsigned long r8;
+  unsigned long r9;
+  unsigned long r10;
+  unsigned long r11;
+  unsigned long r12;
+  unsigned long r13;
+  unsigned long r14;
+  unsigned long r15;
+  unsigned long rdi;
+  unsigned long rsi;
+  unsigned long rbp;
+  unsigned long rbx;
+  unsigned long rdx;
+  unsigned long rax;
+  unsigned long rcx;
+  unsigned long rsp;
+  unsigned long rip;
+  unsigned long eflags;
+  unsigned short cs;
+  unsigned short gs;
+  unsigned short fs;
+  unsigned short __pad0;
+  unsigned long err;
+  unsigned long trapno;
+  unsigned long oldmask;
+  unsigned long cr2;
+  struct _fpstate * fpstate;
+  unsigned long __reserved1 [8];
+};
+# 334 "/usr/include/signal.h" 2 3 4
+
+
+extern int sigreturn (struct sigcontext *__scp) throw ();
+# 346 "/usr/include/signal.h" 3 4
+extern int siginterrupt (int __sig, int __interrupt) throw ();
+
+# 1 "/usr/include/bits/sigstack.h" 1 3 4
+# 26 "/usr/include/bits/sigstack.h" 3 4
+struct sigstack
+  {
+    void *ss_sp;
+    int ss_onstack;
+  };
+
+
+
+enum
+{
+  SS_ONSTACK = 1,
+
+  SS_DISABLE
+
+};
+# 50 "/usr/include/bits/sigstack.h" 3 4
+typedef struct sigaltstack
+  {
+    void *ss_sp;
+    int ss_flags;
+    size_t ss_size;
+  } stack_t;
+# 349 "/usr/include/signal.h" 2 3 4
+
+
+# 1 "/usr/include/sys/ucontext.h" 1 3 4
+# 24 "/usr/include/sys/ucontext.h" 3 4
+# 1 "/usr/include/bits/wordsize.h" 1 3 4
+# 25 "/usr/include/sys/ucontext.h" 2 3 4
+# 33 "/usr/include/sys/ucontext.h" 3 4
+typedef long int greg_t;
+
+
+
+
+
+typedef greg_t gregset_t[23];
+
+
+
+enum
+{
+  REG_R8 = 0,
+
+  REG_R9,
+
+  REG_R10,
+
+  REG_R11,
+
+  REG_R12,
+
+  REG_R13,
+
+  REG_R14,
+
+  REG_R15,
+
+  REG_RDI,
+
+  REG_RSI,
+
+  REG_RBP,
+
+  REG_RBX,
+
+  REG_RDX,
+
+  REG_RAX,
+
+  REG_RCX,
+
+  REG_RSP,
+
+  REG_RIP,
+
+  REG_EFL,
+
+  REG_CSGSFS,
+
+  REG_ERR,
+
+  REG_TRAPNO,
+
+  REG_OLDMASK,
+
+  REG_CR2
+
+};
+
+
+struct _libc_fpxreg
+{
+  unsigned short int significand[4];
+  unsigned short int exponent;
+  unsigned short int padding[3];
+};
+
+struct _libc_xmmreg
+{
+  __uint32_t element[4];
+};
+
+struct _libc_fpstate
+{
+
+  __uint16_t cwd;
+  __uint16_t swd;
+  __uint16_t ftw;
+  __uint16_t fop;
+  __uint64_t rip;
+  __uint64_t rdp;
+  __uint32_t mxcsr;
+  __uint32_t mxcr_mask;
+  struct _libc_fpxreg _st[8];
+  struct _libc_xmmreg _xmm[16];
+  __uint32_t padding[24];
+};
+
+
+typedef struct _libc_fpstate *fpregset_t;
+
+
+typedef struct
+  {
+    gregset_t gregs;
+
+    fpregset_t fpregs;
+    unsigned long __reserved1 [8];
+} mcontext_t;
+
+
+typedef struct ucontext
+  {
+    unsigned long int uc_flags;
+    struct ucontext *uc_link;
+    stack_t uc_stack;
+    mcontext_t uc_mcontext;
+    __sigset_t uc_sigmask;
+    struct _libc_fpstate __fpregs_mem;
+  } ucontext_t;
+# 352 "/usr/include/signal.h" 2 3 4
+
+
+
+
+
+extern int sigstack (struct sigstack *__ss, struct sigstack *__oss)
+     throw () __attribute__ ((__deprecated__));
+
+
+
+extern int sigaltstack (__const struct sigaltstack *__restrict __ss,
+   struct sigaltstack *__restrict __oss) throw ();
+
+
+
+
+
+
+
+extern int sighold (int __sig) throw ();
+
+
+extern int sigrelse (int __sig) throw ();
+
+
+extern int sigignore (int __sig) throw ();
+
+
+extern __sighandler_t sigset (int __sig, __sighandler_t __disp) throw ();
+
+
+
+
+
+
+# 1 "/usr/include/bits/sigthread.h" 1 3 4
+# 31 "/usr/include/bits/sigthread.h" 3 4
+extern int pthread_sigmask (int __how,
+       __const __sigset_t *__restrict __newmask,
+       __sigset_t *__restrict __oldmask)throw ();
+
+
+extern int pthread_kill (pthread_t __threadid, int __signo) throw ();
+# 388 "/usr/include/signal.h" 2 3 4
+
+
+
+
+
+
+extern int __libc_current_sigrtmin (void) throw ();
+
+extern int __libc_current_sigrtmax (void) throw ();
+
+
+
+}
+# 537 "/usr/local/include/papi.h" 2 3
+# 549 "/usr/local/include/papi.h" 3
+ typedef unsigned long PAPI_thread_id_t;
+
+
+ typedef struct _papi_all_thr_spec {
+     int num;
+     PAPI_thread_id_t *id;
+     void **data;
+   } PAPI_all_thr_spec_t;
+
+  typedef void (*PAPI_overflow_handler_t) (int EventSet, void *address,
+                                long long overflow_vector, void *context);
+# 572 "/usr/local/include/papi.h" 3
+   typedef struct _papi_sprofil {
+      void *pr_base;
+      unsigned pr_size;
+      caddr_t pr_off;
+      unsigned pr_scale;
+
+
+
+   } PAPI_sprofil_t;
+
+
+   typedef struct _papi_itimer_option {
+     int itimer_num;
+     int itimer_sig;
+     int ns;
+     int flags;
+   } PAPI_itimer_option_t;
+
+
+   typedef struct _papi_inherit_option {
+      int eventset;
+      int inherit;
+   } PAPI_inherit_option_t;
+
+
+   typedef struct _papi_domain_option {
+      int def_cidx;
+      int eventset;
+      int domain;
+   } PAPI_domain_option_t;
+
+
+   typedef struct _papi_granularity_option {
+      int def_cidx;
+      int eventset;
+      int granularity;
+   } PAPI_granularity_option_t;
+
+
+   typedef struct _papi_preload_option {
+      char lib_preload_env[128];
+      char lib_preload_sep;
+      char lib_dir_env[128];
+      char lib_dir_sep;
+   } PAPI_preload_info_t;
+
+
+   typedef struct _papi_component_option {
+     char name[128];
+     char short_name[64];
+
+     char description[128];
+     char version[64];
+     char support_version[64];
+     char kernel_version[64];
+     char disabled_reason[128];
+     int disabled;
+     int CmpIdx;
+     int num_cntrs;
+     int num_mpx_cntrs;
+     int num_preset_events;
+     int num_native_events;
+     int default_domain;
+     int available_domains;
+     int default_granularity;
+     int available_granularities;
+     int hardware_intr_sig;
+
+     int component_type;
+     int reserved[8];
+     unsigned int hardware_intr:1;
+     unsigned int precise_intr:1;
+     unsigned int posix1b_timers:1;
+     unsigned int kernel_profile:1;
+     unsigned int kernel_multiplex:1;
+
+
+     unsigned int fast_counter_read:1;
+     unsigned int fast_real_timer:1;
+     unsigned int fast_virtual_timer:1;
+     unsigned int attach:1;
+     unsigned int attach_must_ptrace:1;
+
+
+
+
+     unsigned int cntr_umasks:1;
+
+
+
+
+     unsigned int cpu:1;
+     unsigned int inherit:1;
+     unsigned int reserved_bits:12;
+   } PAPI_component_info_t;
+
+
+   typedef struct _papi_mpx_info {
+     int timer_sig;
+     int timer_num;
+     int timer_us;
+   } PAPI_mpx_info_t;
+
+   typedef int (*PAPI_debug_handler_t) (int code);
+
+
+   typedef struct _papi_debug_option {
+      int level;
+      PAPI_debug_handler_t handler;
+   } PAPI_debug_option_t;
+
+
+
+   typedef struct _papi_address_map {
+      char name[1024];
+      caddr_t text_start;
+      caddr_t text_end;
+      caddr_t data_start;
+      caddr_t data_end;
+      caddr_t bss_start;
+      caddr_t bss_end;
+   } PAPI_address_map_t;
+
+
+
+   typedef struct _papi_program_info {
+      char fullname[1024];
+      PAPI_address_map_t address_info;
+   } PAPI_exe_info_t;
+
+
+   typedef struct _papi_shared_lib_info {
+      PAPI_address_map_t *map;
+      int count;
+   } PAPI_shlib_info_t;
+
+
+typedef char* PAPI_user_defined_events_file_t;
+# 739 "/usr/local/include/papi.h" 3
+   typedef struct _papi_mh_tlb_info {
+      int type;
+      int num_entries;
+      int page_size;
+      int associativity;
+   } PAPI_mh_tlb_info_t;
+
+
+   typedef struct _papi_mh_cache_info {
+      int type;
+      int size;
+      int line_size;
+      int num_lines;
+      int associativity;
+   } PAPI_mh_cache_info_t;
+
+
+   typedef struct _papi_mh_level_info {
+      PAPI_mh_tlb_info_t tlb[6];
+      PAPI_mh_cache_info_t cache[6];
+   } PAPI_mh_level_t;
+
+
+
+   typedef struct _papi_mh_info {
+      int levels;
+      PAPI_mh_level_t level[4];
+   } PAPI_mh_info_t;
+
+
+
+   typedef struct _papi_hw_info {
+      int ncpu;
+      int threads;
+      int cores;
+      int sockets;
+      int nnodes;
+      int totalcpus;
+      int vendor;
+      char vendor_string[128];
+      int model;
+      char model_string[128];
+      float revision;
+      int cpuid_family;
+      int cpuid_model;
+      int cpuid_stepping;
+
+      int cpu_max_mhz;
+      int cpu_min_mhz;
+
+      PAPI_mh_info_t mem_hierarchy;
+      int virtualized;
+      char virtual_vendor_string[128];
+
+      char virtual_vendor_version[128];
+
+
+
+      float mhz;
+      int clock_mhz;
+
+
+      int reserved[8];
+
+   } PAPI_hw_info_t;
+
+
+   typedef struct _papi_attach_option {
+      int eventset;
+      unsigned long tid;
+   } PAPI_attach_option_t;
+
+
+      typedef struct _papi_cpu_option {
+         int eventset;
+         unsigned int cpu_num;
+      } PAPI_cpu_option_t;
+
+
+   typedef struct _papi_multiplex_option {
+      int eventset;
+      int ns;
+      int flags;
+   } PAPI_multiplex_option_t;
+
+
+
+   typedef struct _papi_addr_range_option {
+      int eventset;
+      caddr_t start;
+      caddr_t end;
+      int start_off;
+      int end_off;
+   } PAPI_addr_range_option_t;
+
+
+
+
+
+ typedef union
+ {
+  PAPI_preload_info_t preload;
+  PAPI_debug_option_t debug;
+  PAPI_inherit_option_t inherit;
+  PAPI_granularity_option_t granularity;
+  PAPI_granularity_option_t defgranularity;
+  PAPI_domain_option_t domain;
+  PAPI_domain_option_t defdomain;
+  PAPI_attach_option_t attach;
+  PAPI_cpu_option_t cpu;
+  PAPI_multiplex_option_t multiplex;
+  PAPI_itimer_option_t itimer;
+  PAPI_hw_info_t *hw_info;
+  PAPI_shlib_info_t *shlib_info;
+  PAPI_exe_info_t *exe_info;
+  PAPI_component_info_t *cmp_info;
+  PAPI_addr_range_option_t addr;
+  PAPI_user_defined_events_file_t events_file;
+ } PAPI_option_t;
+
+
+
+ typedef struct _dmem_t {
+   long long peak;
+   long long size;
+   long long resident;
+   long long high_water_mark;
+   long long shared;
+   long long text;
+   long long library;
+   long long heap;
+   long long locked;
+   long long stack;
+   long long pagesize;
+   long long pte;
+ } PAPI_dmem_info_t;
+# 915 "/usr/local/include/papi.h" 3
+enum {
+   PAPI_LOCATION_CORE = 0,
+   PAPI_LOCATION_CPU,
+   PAPI_LOCATION_PACKAGE,
+   PAPI_LOCATION_UNCORE,
+};
+
+
+enum {
+   PAPI_DATATYPE_UINT64 = 0,
+   PAPI_DATATYPE_INT64,
+   PAPI_DATATYPE_FP64,
+};
+
+
+enum {
+   PAPI_VALUETYPE_RUNNING_SUM = 0,
+   PAPI_VALUETYPE_ABSOLUTE,
+};
+
+
+enum {
+   PAPI_TIMESCOPE_SINCE_START = 0,
+   PAPI_TIMESCOPE_SINCE_LAST,
+   PAPI_TIMESCOPE_UNTIL_NEXT,
+   PAPI_TIMESCOPE_POINT,
+};
+
+
+enum {
+   PAPI_UPDATETYPE_ARBITRARY = 0,
+   PAPI_UPDATETYPE_PUSH,
+   PAPI_UPDATETYPE_PULL,
+   PAPI_UPDATETYPE_FIXEDFREQ,
+};
+
+
+   typedef struct event_info {
+      unsigned int event_code;
+
+      char symbol[1024];
+      char short_descr[64];
+
+      char long_descr[1024];
+
+
+
+
+      int component_index;
+      char units[64];
+      int location;
+      int data_type;
+      int value_type;
+      int timescope;
+      int update_type;
+      int update_freq;
+
+
+
+
+
+      unsigned int count;
+
+
+
+
+      unsigned int event_type;
+
+
+      char derived[64];
+
+
+      char postfix[256];
+
+
+
+
+      unsigned int code[12];
+
+
+
+
+      char name[12]
+               [256];
+
+
+
+     char note[1024];
+
+
+
+
+   } PAPI_event_info_t;
+
+
+
+
+
+
+   int PAPI_accum(int EventSet, long long * values);
+   int PAPI_add_event(int EventSet, int Event);
+   int PAPI_add_named_event(int EventSet, char *EventName);
+   int PAPI_add_events(int EventSet, int *Events, int number);
+   int PAPI_assign_eventset_component(int EventSet, int cidx);
+   int PAPI_attach(int EventSet, unsigned long tid);
+   int PAPI_cleanup_eventset(int EventSet);
+   int PAPI_create_eventset(int *EventSet);
+   int PAPI_detach(int EventSet);
+   int PAPI_destroy_eventset(int *EventSet);
+   int PAPI_enum_event(int *EventCode, int modifier);
+   int PAPI_enum_cmp_event(int *EventCode, int modifier, int cidx);
+   int PAPI_event_code_to_name(int EventCode, char *out);
+   int PAPI_event_name_to_code(char *in, int *out);
+   int PAPI_get_dmem_info(PAPI_dmem_info_t *dest);
+   int PAPI_get_event_info(int EventCode, PAPI_event_info_t * info);
+   const PAPI_exe_info_t *PAPI_get_executable_info(void);
+   const PAPI_hw_info_t *PAPI_get_hardware_info(void);
+   const PAPI_component_info_t *PAPI_get_component_info(int cidx);
+   int PAPI_get_multiplex(int EventSet);
+   int PAPI_get_opt(int option, PAPI_option_t * ptr);
+   int PAPI_get_cmp_opt(int option, PAPI_option_t * ptr,int cidx);
+   long long PAPI_get_real_cyc(void);
+   long long PAPI_get_real_nsec(void);
+   long long PAPI_get_real_usec(void);
+   const PAPI_shlib_info_t *PAPI_get_shared_lib_info(void);
+   int PAPI_get_thr_specific(int tag, void **ptr);
+   int PAPI_get_overflow_event_index(int Eventset, long long overflow_vector, int *array, int *number);
+   long long PAPI_get_virt_cyc(void);
+   long long PAPI_get_virt_nsec(void);
+   long long PAPI_get_virt_usec(void);
+   int PAPI_is_initialized(void);
+   int PAPI_library_init(int version);
+   int PAPI_list_events(int EventSet, int *Events, int *number);
+   int PAPI_list_threads(unsigned long *tids, int *number);
+   int PAPI_lock(int);
+   int PAPI_multiplex_init(void);
+   int PAPI_num_cmp_hwctrs(int cidx);
+    int PAPI_num_events(int EventSet);
+   int PAPI_overflow(int EventSet, int EventCode, int threshold,
+                     int flags, PAPI_overflow_handler_t handler);
+   void PAPI_perror(char *msg );
+   int PAPI_profil(void *buf, unsigned bufsiz, caddr_t offset,
+      unsigned scale, int EventSet, int EventCode,
+      int threshold, int flags);
+   int PAPI_query_event(int EventCode);
+   int PAPI_query_named_event(char *EventName);
+   int PAPI_read(int EventSet, long long * values);
+   int PAPI_read_ts(int EventSet, long long * values, long long *cyc);
+   int PAPI_register_thread(void);
+   int PAPI_remove_event(int EventSet, int EventCode);
+   int PAPI_remove_named_event(int EventSet, char *EventName);
+   int PAPI_remove_events(int EventSet, int *Events, int number);
+   int PAPI_reset(int EventSet);
+   int PAPI_set_debug(int level);
+   int PAPI_set_cmp_domain(int domain, int cidx);
+   int PAPI_set_domain(int domain);
+   int PAPI_set_cmp_granularity(int granularity, int cidx);
+   int PAPI_set_granularity(int granularity);
+   int PAPI_set_multiplex(int EventSet);
+   int PAPI_set_opt(int option, PAPI_option_t * ptr);
+   int PAPI_set_thr_specific(int tag, void *ptr);
+   void PAPI_shutdown(void);
+   int PAPI_sprofil(PAPI_sprofil_t * prof, int profcnt, int EventSet, int EventCode, int threshold, int flags);
+   int PAPI_start(int EventSet);
+   int PAPI_state(int EventSet, int *status);
+   int PAPI_stop(int EventSet, long long * values);
+   char *PAPI_strerror(int);
+   unsigned long PAPI_thread_id(void);
+   int PAPI_thread_init(unsigned long (*id_fn) (void));
+   int PAPI_unlock(int);
+   int PAPI_unregister_thread(void);
+   int PAPI_write(int EventSet, long long * values);
+   int PAPI_get_event_component(int EventCode);
+   int PAPI_get_component_index(char *name);
+   int PAPI_disable_component(int cidx);
+   int PAPI_disable_component_by_name( char *name );
+# 1103 "/usr/local/include/papi.h" 3
+   int PAPI_accum_counters(long long * values, int array_len);
+   int PAPI_num_counters(void);
+   int PAPI_num_components(void);
+   int PAPI_read_counters(long long * values, int array_len);
+   int PAPI_start_counters(int *events, int array_len);
+   int PAPI_stop_counters(long long * values, int array_len);
+   int PAPI_flips(float *rtime, float *ptime, long long * flpins, float *mflips);
+   int PAPI_flops(float *rtime, float *ptime, long long * flpops, float *mflops);
+   int PAPI_ipc(float *rtime, float *ptime, long long * ins, float *ipc);
+
+
+
+
+
+int PAPI_num_hwctrs(void);
+
+
+
+
+}
+# 36 "ljs.cpp" 2
 # 1 "variant.h" 1
 # 37 "ljs.cpp" 2
 # 1 "ljs.h" 1
@@ -39533,6 +40941,1469 @@ class ForceLJ : Force
 
 };
 # 50 "ljs.cpp" 2
+# 1 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/backward/iostream.h" 1 3
+# 31 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/backward/iostream.h" 3
+# 1 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/backward/backward_warning.h" 1 3
+# 32 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/backward/iostream.h" 2 3
+
+
+using std::iostream;
+using std::ostream;
+using std::istream;
+using std::ios;
+using std::streambuf;
+
+using std::cout;
+using std::cin;
+using std::cerr;
+using std::clog;
+
+using std::wcout;
+using std::wcin;
+using std::wcerr;
+using std::wclog;
+
+
+using std::ws;
+using std::endl;
+using std::ends;
+using std::flush;
+# 51 "ljs.cpp" 2
+# 1 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/backward/fstream.h" 1 3
+# 32 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/backward/fstream.h" 3
+# 1 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 1 3
+# 42 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+       
+# 43 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+
+
+
+
+
+# 1 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/x86_64-redhat-linux/bits/basic_file.h" 1 3
+# 42 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/x86_64-redhat-linux/bits/basic_file.h" 3
+       
+# 43 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/x86_64-redhat-linux/bits/basic_file.h" 3
+
+
+
+
+namespace std
+{
+
+  template<typename _CharT>
+    class __basic_file;
+
+
+  template<>
+    class __basic_file<char>
+    {
+
+      __c_file* _M_cfile;
+
+
+      bool _M_cfile_created;
+
+    public:
+      __basic_file(__c_lock* __lock = 0);
+
+      __basic_file*
+      open(const char* __name, ios_base::openmode __mode, int __prot = 0664);
+
+      __basic_file*
+      sys_open(__c_file* __file, ios_base::openmode);
+
+      __basic_file*
+      sys_open(int __fd, ios_base::openmode __mode);
+
+      __basic_file*
+      close();
+
+      bool
+      is_open() const;
+
+      int
+      fd();
+
+      __c_file*
+      file();
+
+      ~__basic_file();
+
+      streamsize
+      xsputn(const char* __s, streamsize __n);
+
+      streamsize
+      xsputn_2(const char* __s1, streamsize __n1,
+        const char* __s2, streamsize __n2);
+
+      streamsize
+      xsgetn(char* __s, streamsize __n);
+
+      streamoff
+      seekoff(streamoff __off, ios_base::seekdir __way);
+
+      int
+      sync();
+
+      streamsize
+      showmanyc();
+    };
+}
+# 49 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 2 3
+
+
+namespace std
+{
+# 67 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+  template<typename _CharT, typename _Traits>
+    class basic_filebuf : public basic_streambuf<_CharT, _Traits>
+    {
+    public:
+
+      typedef _CharT char_type;
+      typedef _Traits traits_type;
+      typedef typename traits_type::int_type int_type;
+      typedef typename traits_type::pos_type pos_type;
+      typedef typename traits_type::off_type off_type;
+
+      typedef basic_streambuf<char_type, traits_type> __streambuf_type;
+      typedef basic_filebuf<char_type, traits_type> __filebuf_type;
+      typedef __basic_file<char> __file_type;
+      typedef typename traits_type::state_type __state_type;
+      typedef codecvt<char_type, char, __state_type> __codecvt_type;
+
+      friend class ios_base;
+
+    protected:
+
+
+      __c_lock _M_lock;
+
+
+      __file_type _M_file;
+
+
+
+
+
+
+      ios_base::openmode _M_mode;
+
+
+      __state_type _M_state_beg;
+
+
+
+
+      __state_type _M_state_cur;
+
+
+
+      __state_type _M_state_last;
+
+
+
+
+
+
+      char_type* _M_buf;
+# 127 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      size_t _M_buf_size;
+
+
+      bool _M_buf_allocated;
+# 141 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      bool _M_reading;
+      bool _M_writing;
+# 152 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      char_type _M_pback;
+      char_type* _M_pback_cur_save;
+      char_type* _M_pback_end_save;
+      bool _M_pback_init;
+
+
+
+      const __codecvt_type* _M_codecvt;
+# 168 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      char* _M_ext_buf;
+
+
+
+
+
+
+      streamsize _M_ext_buf_size;
+# 184 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      const char* _M_ext_next;
+      char* _M_ext_end;
+# 194 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      void
+      _M_create_pback()
+      {
+ if (!_M_pback_init)
+   {
+     _M_pback_cur_save = this->gptr();
+     _M_pback_end_save = this->egptr();
+     this->setg(&_M_pback, &_M_pback, &_M_pback + 1);
+     _M_pback_init = true;
+   }
+      }
+# 213 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      void
+      _M_destroy_pback() throw()
+      {
+ if (_M_pback_init)
+   {
+
+     _M_pback_cur_save += this->gptr() != this->eback();
+     this->setg(_M_buf, _M_pback_cur_save, _M_pback_end_save);
+     _M_pback_init = false;
+   }
+      }
+
+    public:
+
+
+
+
+
+
+
+      basic_filebuf();
+
+
+
+
+      virtual
+      ~basic_filebuf()
+      { this->close(); }
+
+
+
+
+
+      bool
+      is_open() const throw()
+      { return _M_file.is_open(); }
+# 263 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      __filebuf_type*
+      open(const char* __s, ios_base::openmode __mode);
+# 277 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      __filebuf_type*
+      close() throw();
+
+    protected:
+      void
+      _M_allocate_internal_buffer();
+
+      void
+      _M_destroy_internal_buffer() throw();
+
+
+      virtual streamsize
+      showmanyc();
+
+
+
+
+
+
+      virtual int_type
+      underflow();
+
+      virtual int_type
+      pbackfail(int_type __c = _Traits::eof());
+# 309 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      virtual int_type
+      overflow(int_type __c = _Traits::eof());
+
+
+
+      bool
+      _M_convert_to_external(char_type*, streamsize);
+# 329 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      virtual __streambuf_type*
+      setbuf(char_type* __s, streamsize __n);
+
+      virtual pos_type
+      seekoff(off_type __off, ios_base::seekdir __way,
+       ios_base::openmode __mode = ios_base::in | ios_base::out);
+
+      virtual pos_type
+      seekpos(pos_type __pos,
+       ios_base::openmode __mode = ios_base::in | ios_base::out);
+
+
+      pos_type
+      _M_seek(off_type __off, ios_base::seekdir __way, __state_type __state);
+
+      virtual int
+      sync();
+
+      virtual void
+      imbue(const locale& __loc);
+
+      virtual streamsize
+      xsgetn(char_type* __s, streamsize __n);
+
+      virtual streamsize
+      xsputn(const char_type* __s, streamsize __n);
+
+
+      bool
+      _M_terminate_output();
+# 374 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      void
+      _M_set_buffer(streamsize __off)
+      {
+  const bool __testin = _M_mode & ios_base::in;
+  const bool __testout = _M_mode & ios_base::out;
+
+ if (__testin && __off > 0)
+   this->setg(_M_buf, _M_buf, _M_buf + __off);
+ else
+   this->setg(_M_buf, _M_buf, _M_buf);
+
+ if (__testout && __off == 0 && _M_buf_size > 1 )
+   this->setp(_M_buf, _M_buf + _M_buf_size - 1);
+ else
+   this->setp(__null, __null);
+      }
+    };
+# 401 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+  template<typename _CharT, typename _Traits>
+    class basic_ifstream : public basic_istream<_CharT, _Traits>
+    {
+    public:
+
+      typedef _CharT char_type;
+      typedef _Traits traits_type;
+      typedef typename traits_type::int_type int_type;
+      typedef typename traits_type::pos_type pos_type;
+      typedef typename traits_type::off_type off_type;
+
+
+      typedef basic_filebuf<char_type, traits_type> __filebuf_type;
+      typedef basic_istream<char_type, traits_type> __istream_type;
+
+    private:
+      __filebuf_type _M_filebuf;
+
+    public:
+# 428 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      basic_ifstream() : __istream_type(), _M_filebuf()
+      { this->init(&_M_filebuf); }
+# 441 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      explicit
+      basic_ifstream(const char* __s, ios_base::openmode __mode = ios_base::in)
+      : __istream_type(), _M_filebuf()
+      {
+ this->init(&_M_filebuf);
+ this->open(__s, __mode);
+      }
+
+
+
+
+
+
+
+      ~basic_ifstream()
+      { }
+# 465 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      __filebuf_type*
+      rdbuf() const
+      { return const_cast<__filebuf_type*>(&_M_filebuf); }
+
+
+
+
+
+      bool
+      is_open()
+      { return _M_filebuf.is_open(); }
+
+
+
+      bool
+      is_open() const
+      { return _M_filebuf.is_open(); }
+# 494 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      void
+      open(const char* __s, ios_base::openmode __mode = ios_base::in)
+      {
+ if (!_M_filebuf.open(__s, __mode | ios_base::in))
+   this->setstate(ios_base::failbit);
+ else
+
+
+   this->clear();
+      }
+
+
+
+
+
+
+
+      void
+      close()
+      {
+ if (!_M_filebuf.close())
+   this->setstate(ios_base::failbit);
+      }
+    };
+# 529 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+  template<typename _CharT, typename _Traits>
+    class basic_ofstream : public basic_ostream<_CharT,_Traits>
+    {
+    public:
+
+      typedef _CharT char_type;
+      typedef _Traits traits_type;
+      typedef typename traits_type::int_type int_type;
+      typedef typename traits_type::pos_type pos_type;
+      typedef typename traits_type::off_type off_type;
+
+
+      typedef basic_filebuf<char_type, traits_type> __filebuf_type;
+      typedef basic_ostream<char_type, traits_type> __ostream_type;
+
+    private:
+      __filebuf_type _M_filebuf;
+
+    public:
+# 556 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      basic_ofstream(): __ostream_type(), _M_filebuf()
+      { this->init(&_M_filebuf); }
+# 570 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      explicit
+      basic_ofstream(const char* __s,
+       ios_base::openmode __mode = ios_base::out|ios_base::trunc)
+      : __ostream_type(), _M_filebuf()
+      {
+ this->init(&_M_filebuf);
+ this->open(__s, __mode);
+      }
+
+
+
+
+
+
+
+      ~basic_ofstream()
+      { }
+# 595 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      __filebuf_type*
+      rdbuf() const
+      { return const_cast<__filebuf_type*>(&_M_filebuf); }
+
+
+
+
+
+      bool
+      is_open()
+      { return _M_filebuf.is_open(); }
+
+
+
+      bool
+      is_open() const
+      { return _M_filebuf.is_open(); }
+# 624 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      void
+      open(const char* __s,
+    ios_base::openmode __mode = ios_base::out | ios_base::trunc)
+      {
+ if (!_M_filebuf.open(__s, __mode | ios_base::out))
+   this->setstate(ios_base::failbit);
+ else
+
+
+   this->clear();
+      }
+
+
+
+
+
+
+
+      void
+      close()
+      {
+ if (!_M_filebuf.close())
+   this->setstate(ios_base::failbit);
+      }
+    };
+# 660 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+  template<typename _CharT, typename _Traits>
+    class basic_fstream : public basic_iostream<_CharT, _Traits>
+    {
+    public:
+
+      typedef _CharT char_type;
+      typedef _Traits traits_type;
+      typedef typename traits_type::int_type int_type;
+      typedef typename traits_type::pos_type pos_type;
+      typedef typename traits_type::off_type off_type;
+
+
+      typedef basic_filebuf<char_type, traits_type> __filebuf_type;
+      typedef basic_ios<char_type, traits_type> __ios_type;
+      typedef basic_iostream<char_type, traits_type> __iostream_type;
+
+    private:
+      __filebuf_type _M_filebuf;
+
+    public:
+# 688 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      basic_fstream()
+      : __iostream_type(), _M_filebuf()
+      { this->init(&_M_filebuf); }
+# 700 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      explicit
+      basic_fstream(const char* __s,
+      ios_base::openmode __mode = ios_base::in | ios_base::out)
+      : __iostream_type(__null), _M_filebuf()
+      {
+ this->init(&_M_filebuf);
+ this->open(__s, __mode);
+      }
+
+
+
+
+
+
+
+      ~basic_fstream()
+      { }
+# 725 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      __filebuf_type*
+      rdbuf() const
+      { return const_cast<__filebuf_type*>(&_M_filebuf); }
+
+
+
+
+
+      bool
+      is_open()
+      { return _M_filebuf.is_open(); }
+
+
+
+      bool
+      is_open() const
+      { return _M_filebuf.is_open(); }
+# 754 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 3
+      void
+      open(const char* __s,
+    ios_base::openmode __mode = ios_base::in | ios_base::out)
+      {
+ if (!_M_filebuf.open(__s, __mode))
+   this->setstate(ios_base::failbit);
+ else
+
+
+   this->clear();
+      }
+
+
+
+
+
+
+
+      void
+      close()
+      {
+ if (!_M_filebuf.close())
+   this->setstate(ios_base::failbit);
+      }
+    };
+}
+
+
+# 1 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/bits/fstream.tcc" 1 3
+# 43 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/bits/fstream.tcc" 3
+       
+# 44 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/bits/fstream.tcc" 3
+
+namespace std
+{
+  template<typename _CharT, typename _Traits>
+    void
+    basic_filebuf<_CharT, _Traits>::
+    _M_allocate_internal_buffer()
+    {
+
+
+      if (!_M_buf_allocated && !_M_buf)
+ {
+   _M_buf = new char_type[_M_buf_size];
+   _M_buf_allocated = true;
+ }
+    }
+
+  template<typename _CharT, typename _Traits>
+    void
+    basic_filebuf<_CharT, _Traits>::
+    _M_destroy_internal_buffer() throw()
+    {
+      if (_M_buf_allocated)
+ {
+   delete [] _M_buf;
+   _M_buf = __null;
+   _M_buf_allocated = false;
+ }
+      delete [] _M_ext_buf;
+      _M_ext_buf = __null;
+      _M_ext_buf_size = 0;
+      _M_ext_next = __null;
+      _M_ext_end = __null;
+    }
+
+  template<typename _CharT, typename _Traits>
+    basic_filebuf<_CharT, _Traits>::
+    basic_filebuf() : __streambuf_type(), _M_lock(), _M_file(&_M_lock),
+    _M_mode(ios_base::openmode(0)), _M_state_beg(), _M_state_cur(),
+    _M_state_last(), _M_buf(__null), _M_buf_size(8192),
+    _M_buf_allocated(false), _M_reading(false), _M_writing(false), _M_pback(),
+    _M_pback_cur_save(0), _M_pback_end_save(0), _M_pback_init(false),
+    _M_codecvt(0), _M_ext_buf(0), _M_ext_buf_size(0), _M_ext_next(0),
+    _M_ext_end(0)
+    {
+      if (has_facet<__codecvt_type>(this->_M_buf_locale))
+ _M_codecvt = &use_facet<__codecvt_type>(this->_M_buf_locale);
+    }
+
+  template<typename _CharT, typename _Traits>
+    typename basic_filebuf<_CharT, _Traits>::__filebuf_type*
+    basic_filebuf<_CharT, _Traits>::
+    open(const char* __s, ios_base::openmode __mode)
+    {
+      __filebuf_type *__ret = __null;
+      if (!this->is_open())
+ {
+   _M_file.open(__s, __mode);
+   if (this->is_open())
+     {
+       _M_allocate_internal_buffer();
+       _M_mode = __mode;
+
+
+       _M_reading = false;
+       _M_writing = false;
+       _M_set_buffer(-1);
+
+
+       _M_state_last = _M_state_cur = _M_state_beg;
+
+
+       if ((__mode & ios_base::ate)
+    && this->seekoff(0, ios_base::end, __mode)
+    == pos_type(off_type(-1)))
+  this->close();
+       else
+  __ret = this;
+     }
+ }
+      return __ret;
+    }
+
+  template<typename _CharT, typename _Traits>
+    typename basic_filebuf<_CharT, _Traits>::__filebuf_type*
+    basic_filebuf<_CharT, _Traits>::
+    close() throw()
+    {
+      __filebuf_type* __ret = __null;
+      if (this->is_open())
+ {
+   bool __testfail = false;
+   try
+     {
+       if (!_M_terminate_output())
+  __testfail = true;
+     }
+   catch(...)
+     { __testfail = true; }
+
+
+   _M_mode = ios_base::openmode(0);
+   _M_pback_init = false;
+   _M_destroy_internal_buffer();
+   _M_reading = false;
+   _M_writing = false;
+   _M_set_buffer(-1);
+   _M_state_last = _M_state_cur = _M_state_beg;
+
+   if (!_M_file.close())
+     __testfail = true;
+
+   if (!__testfail)
+     __ret = this;
+ }
+      return __ret;
+    }
+
+  template<typename _CharT, typename _Traits>
+    streamsize
+    basic_filebuf<_CharT, _Traits>::
+    showmanyc()
+    {
+      streamsize __ret = -1;
+      const bool __testin = _M_mode & ios_base::in;
+      if (__testin && this->is_open())
+ {
+
+
+   __ret = this->egptr() - this->gptr();
+
+
+
+
+
+
+
+   if (__check_facet(_M_codecvt).encoding() >= 0)
+
+     __ret += _M_file.showmanyc() / _M_codecvt->max_length();
+ }
+      return __ret;
+    }
+
+  template<typename _CharT, typename _Traits>
+    typename basic_filebuf<_CharT, _Traits>::int_type
+    basic_filebuf<_CharT, _Traits>::
+    underflow()
+    {
+      int_type __ret = traits_type::eof();
+      const bool __testin = _M_mode & ios_base::in;
+      if (__testin && !_M_writing)
+ {
+
+
+
+   _M_destroy_pback();
+
+   if (this->gptr() < this->egptr())
+     return traits_type::to_int_type(*this->gptr());
+
+
+   const size_t __buflen = _M_buf_size > 1 ? _M_buf_size - 1 : 1;
+
+
+   bool __got_eof = false;
+
+   streamsize __ilen = 0;
+   codecvt_base::result __r = codecvt_base::ok;
+   if (__check_facet(_M_codecvt).always_noconv())
+     {
+       __ilen = _M_file.xsgetn(reinterpret_cast<char*>(this->eback()),
+          __buflen);
+       if (__ilen == 0)
+  __got_eof = true;
+     }
+   else
+     {
+
+
+       const int __enc = _M_codecvt->encoding();
+       streamsize __blen;
+       streamsize __rlen;
+       if (__enc > 0)
+  __blen = __rlen = __buflen * __enc;
+       else
+  {
+    __blen = __buflen + _M_codecvt->max_length() - 1;
+    __rlen = __buflen;
+  }
+       const streamsize __remainder = _M_ext_end - _M_ext_next;
+       __rlen = __rlen > __remainder ? __rlen - __remainder : 0;
+
+
+
+       if (_M_reading && this->egptr() == this->eback() && __remainder)
+  __rlen = 0;
+
+
+
+       if (_M_ext_buf_size < __blen)
+  {
+    char* __buf = new char[__blen];
+    if (__remainder)
+      std::memcpy(__buf, _M_ext_next, __remainder);
+
+    delete [] _M_ext_buf;
+    _M_ext_buf = __buf;
+    _M_ext_buf_size = __blen;
+  }
+       else if (__remainder)
+  std::memmove(_M_ext_buf, _M_ext_next, __remainder);
+
+       _M_ext_next = _M_ext_buf;
+       _M_ext_end = _M_ext_buf + __remainder;
+       _M_state_last = _M_state_cur;
+
+       do
+  {
+    if (__rlen > 0)
+      {
+
+
+
+        if (_M_ext_end - _M_ext_buf + __rlen > _M_ext_buf_size)
+   {
+     __throw_ios_failure(("basic_filebuf::underflow " "codecvt::max_length() " "is not valid"));
+
+
+   }
+        streamsize __elen = _M_file.xsgetn(_M_ext_end, __rlen);
+        if (__elen == 0)
+   __got_eof = true;
+        else if (__elen == -1)
+   break;
+        _M_ext_end += __elen;
+      }
+
+    char_type* __iend;
+    __r = _M_codecvt->in(_M_state_cur, _M_ext_next,
+           _M_ext_end, _M_ext_next, this->eback(),
+           this->eback() + __buflen, __iend);
+    if (__r == codecvt_base::noconv)
+      {
+        size_t __avail = _M_ext_end - _M_ext_buf;
+        __ilen = std::min(__avail, __buflen);
+        traits_type::copy(this->eback(),
+     reinterpret_cast<char_type*>(_M_ext_buf), __ilen);
+        _M_ext_next = _M_ext_buf + __ilen;
+      }
+    else
+      __ilen = __iend - this->eback();
+
+
+
+
+    if (__r == codecvt_base::error)
+      break;
+
+    __rlen = 1;
+  }
+       while (__ilen == 0 && !__got_eof);
+     }
+
+   if (__ilen > 0)
+     {
+       _M_set_buffer(__ilen);
+       _M_reading = true;
+       __ret = traits_type::to_int_type(*this->gptr());
+     }
+   else if (__got_eof)
+     {
+
+
+
+       _M_set_buffer(-1);
+       _M_reading = false;
+
+
+       if (__r == codecvt_base::partial)
+  __throw_ios_failure(("basic_filebuf::underflow " "incomplete character in file"));
+
+     }
+   else if (__r == codecvt_base::error)
+     __throw_ios_failure(("basic_filebuf::underflow " "invalid byte sequence in file"));
+
+   else
+     __throw_ios_failure(("basic_filebuf::underflow " "error reading the file"));
+
+ }
+      return __ret;
+    }
+
+  template<typename _CharT, typename _Traits>
+    typename basic_filebuf<_CharT, _Traits>::int_type
+    basic_filebuf<_CharT, _Traits>::
+    pbackfail(int_type __i)
+    {
+      int_type __ret = traits_type::eof();
+      const bool __testin = _M_mode & ios_base::in;
+      if (__testin && !_M_writing)
+ {
+
+
+   const bool __testpb = _M_pback_init;
+   const bool __testeof = traits_type::eq_int_type(__i, __ret);
+   int_type __tmp;
+   if (this->eback() < this->gptr())
+     {
+       this->gbump(-1);
+       __tmp = traits_type::to_int_type(*this->gptr());
+     }
+   else if (this->seekoff(-1, ios_base::cur) != pos_type(off_type(-1)))
+     {
+       __tmp = this->underflow();
+       if (traits_type::eq_int_type(__tmp, __ret))
+  return __ret;
+     }
+   else
+     {
+
+
+
+
+
+       return __ret;
+     }
+
+
+
+   if (!__testeof && traits_type::eq_int_type(__i, __tmp))
+     __ret = __i;
+   else if (__testeof)
+     __ret = traits_type::not_eof(__i);
+   else if (!__testpb)
+     {
+       _M_create_pback();
+       _M_reading = true;
+       *this->gptr() = traits_type::to_char_type(__i);
+       __ret = __i;
+     }
+ }
+      return __ret;
+    }
+
+  template<typename _CharT, typename _Traits>
+    typename basic_filebuf<_CharT, _Traits>::int_type
+    basic_filebuf<_CharT, _Traits>::
+    overflow(int_type __c)
+    {
+      int_type __ret = traits_type::eof();
+      const bool __testeof = traits_type::eq_int_type(__c, __ret);
+      const bool __testout = _M_mode & ios_base::out;
+      if (__testout && !_M_reading)
+ {
+   if (this->pbase() < this->pptr())
+     {
+
+       if (!__testeof)
+  {
+    *this->pptr() = traits_type::to_char_type(__c);
+    this->pbump(1);
+  }
+
+
+
+       if (_M_convert_to_external(this->pbase(),
+      this->pptr() - this->pbase()))
+  {
+    _M_set_buffer(0);
+    __ret = traits_type::not_eof(__c);
+  }
+     }
+   else if (_M_buf_size > 1)
+     {
+
+
+
+       _M_set_buffer(0);
+       _M_writing = true;
+       if (!__testeof)
+  {
+    *this->pptr() = traits_type::to_char_type(__c);
+    this->pbump(1);
+  }
+       __ret = traits_type::not_eof(__c);
+     }
+   else
+     {
+
+       char_type __conv = traits_type::to_char_type(__c);
+       if (__testeof || _M_convert_to_external(&__conv, 1))
+  {
+    _M_writing = true;
+    __ret = traits_type::not_eof(__c);
+  }
+     }
+ }
+      return __ret;
+    }
+
+  template<typename _CharT, typename _Traits>
+    bool
+    basic_filebuf<_CharT, _Traits>::
+    _M_convert_to_external(_CharT* __ibuf, streamsize __ilen)
+    {
+
+      streamsize __elen;
+      streamsize __plen;
+      if (__check_facet(_M_codecvt).always_noconv())
+ {
+   __elen = _M_file.xsputn(reinterpret_cast<char*>(__ibuf), __ilen);
+   __plen = __ilen;
+ }
+      else
+ {
+
+
+   streamsize __blen = __ilen * _M_codecvt->max_length();
+   char* __buf = static_cast<char*>(__builtin_alloca(__blen));
+
+   char* __bend;
+   const char_type* __iend;
+   codecvt_base::result __r;
+   __r = _M_codecvt->out(_M_state_cur, __ibuf, __ibuf + __ilen,
+    __iend, __buf, __buf + __blen, __bend);
+
+   if (__r == codecvt_base::ok || __r == codecvt_base::partial)
+     __blen = __bend - __buf;
+   else if (__r == codecvt_base::noconv)
+     {
+
+       __buf = reinterpret_cast<char*>(__ibuf);
+       __blen = __ilen;
+     }
+   else
+     __throw_ios_failure(("basic_filebuf::_M_convert_to_external " "conversion error"));
+
+
+   __elen = _M_file.xsputn(__buf, __blen);
+   __plen = __blen;
+
+
+   if (__r == codecvt_base::partial && __elen == __plen)
+     {
+       const char_type* __iresume = __iend;
+       streamsize __rlen = this->pptr() - __iend;
+       __r = _M_codecvt->out(_M_state_cur, __iresume,
+        __iresume + __rlen, __iend, __buf,
+        __buf + __blen, __bend);
+       if (__r != codecvt_base::error)
+  {
+    __rlen = __bend - __buf;
+    __elen = _M_file.xsputn(__buf, __rlen);
+    __plen = __rlen;
+  }
+       else
+  __throw_ios_failure(("basic_filebuf::_M_convert_to_external " "conversion error"));
+
+     }
+ }
+      return __elen == __plen;
+    }
+
+   template<typename _CharT, typename _Traits>
+     streamsize
+     basic_filebuf<_CharT, _Traits>::
+     xsgetn(_CharT* __s, streamsize __n)
+     {
+
+       streamsize __ret = 0;
+       if (_M_pback_init)
+  {
+    if (__n > 0 && this->gptr() == this->eback())
+      {
+        *__s++ = *this->gptr();
+        this->gbump(1);
+        __ret = 1;
+        --__n;
+      }
+    _M_destroy_pback();
+  }
+
+
+
+
+       const bool __testin = _M_mode & ios_base::in;
+       const streamsize __buflen = _M_buf_size > 1 ? _M_buf_size - 1 : 1;
+
+       if (__n > __buflen && __check_facet(_M_codecvt).always_noconv()
+    && __testin && !_M_writing)
+  {
+
+    const streamsize __avail = this->egptr() - this->gptr();
+    if (__avail != 0)
+      {
+        if (__avail == 1)
+   *__s = *this->gptr();
+        else
+   traits_type::copy(__s, this->gptr(), __avail);
+        __s += __avail;
+        this->gbump(__avail);
+        __ret += __avail;
+        __n -= __avail;
+      }
+
+
+
+    streamsize __len;
+    for (;;)
+      {
+        __len = _M_file.xsgetn(reinterpret_cast<char*>(__s),
+          __n);
+        if (__len == -1)
+   __throw_ios_failure(("basic_filebuf::xsgetn " "error reading the file"));
+
+        if (__len == 0)
+   break;
+
+        __n -= __len;
+        __ret += __len;
+        if (__n == 0)
+   break;
+
+        __s += __len;
+      }
+
+    if (__n == 0)
+      {
+        _M_set_buffer(0);
+        _M_reading = true;
+      }
+    else if (__len == 0)
+      {
+
+
+
+        _M_set_buffer(-1);
+        _M_reading = false;
+      }
+  }
+       else
+  __ret += __streambuf_type::xsgetn(__s, __n);
+
+       return __ret;
+     }
+
+   template<typename _CharT, typename _Traits>
+     streamsize
+     basic_filebuf<_CharT, _Traits>::
+     xsputn(const _CharT* __s, streamsize __n)
+     {
+
+
+
+       streamsize __ret = 0;
+       const bool __testout = _M_mode & ios_base::out;
+       if (__check_facet(_M_codecvt).always_noconv()
+    && __testout && !_M_reading)
+ {
+
+   const streamsize __chunk = 1ul << 10;
+   streamsize __bufavail = this->epptr() - this->pptr();
+
+
+   if (!_M_writing && _M_buf_size > 1)
+     __bufavail = _M_buf_size - 1;
+
+   const streamsize __limit = std::min(__chunk, __bufavail);
+   if (__n >= __limit)
+     {
+       const streamsize __buffill = this->pptr() - this->pbase();
+       const char* __buf = reinterpret_cast<const char*>(this->pbase());
+       __ret = _M_file.xsputn_2(__buf, __buffill,
+           reinterpret_cast<const char*>(__s),
+           __n);
+       if (__ret == __buffill + __n)
+  {
+    _M_set_buffer(0);
+    _M_writing = true;
+  }
+       if (__ret > __buffill)
+  __ret -= __buffill;
+       else
+  __ret = 0;
+     }
+   else
+     __ret = __streambuf_type::xsputn(__s, __n);
+ }
+       else
+  __ret = __streambuf_type::xsputn(__s, __n);
+       return __ret;
+    }
+
+  template<typename _CharT, typename _Traits>
+    typename basic_filebuf<_CharT, _Traits>::__streambuf_type*
+    basic_filebuf<_CharT, _Traits>::
+    setbuf(char_type* __s, streamsize __n)
+    {
+      if (!this->is_open())
+ if (__s == 0 && __n == 0)
+   _M_buf_size = 1;
+ else if (__s && __n > 0)
+   {
+# 656 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/bits/fstream.tcc" 3
+     _M_buf = __s;
+     _M_buf_size = __n;
+   }
+      return this;
+    }
+
+
+
+
+  template<typename _CharT, typename _Traits>
+    typename basic_filebuf<_CharT, _Traits>::pos_type
+    basic_filebuf<_CharT, _Traits>::
+    seekoff(off_type __off, ios_base::seekdir __way, ios_base::openmode)
+    {
+      int __width = 0;
+      if (_M_codecvt)
+ __width = _M_codecvt->encoding();
+      if (__width < 0)
+ __width = 0;
+
+      pos_type __ret = pos_type(off_type(-1));
+      const bool __testfail = __off != 0 && __width <= 0;
+      if (this->is_open() && !__testfail)
+ {
+
+   _M_destroy_pback();
+
+
+
+
+
+
+   __state_type __state = _M_state_beg;
+   off_type __computed_off = __off * __width;
+   if (_M_reading && __way == ios_base::cur)
+     {
+       if (_M_codecvt->always_noconv())
+  __computed_off += this->gptr() - this->egptr();
+       else
+  {
+
+
+
+    const int __gptr_off =
+      _M_codecvt->length(_M_state_last, _M_ext_buf, _M_ext_next,
+           this->gptr() - this->eback());
+    __computed_off += _M_ext_buf + __gptr_off - _M_ext_end;
+
+
+
+    __state = _M_state_last;
+  }
+     }
+   __ret = _M_seek(__computed_off, __way, __state);
+ }
+      return __ret;
+    }
+
+
+
+
+
+  template<typename _CharT, typename _Traits>
+    typename basic_filebuf<_CharT, _Traits>::pos_type
+    basic_filebuf<_CharT, _Traits>::
+    seekpos(pos_type __pos, ios_base::openmode)
+    {
+      pos_type __ret = pos_type(off_type(-1));
+      if (this->is_open())
+ {
+
+   _M_destroy_pback();
+   __ret = _M_seek(off_type(__pos), ios_base::beg, __pos.state());
+ }
+      return __ret;
+    }
+
+  template<typename _CharT, typename _Traits>
+    typename basic_filebuf<_CharT, _Traits>::pos_type
+    basic_filebuf<_CharT, _Traits>::
+    _M_seek(off_type __off, ios_base::seekdir __way, __state_type __state)
+    {
+      pos_type __ret = pos_type(off_type(-1));
+      if (_M_terminate_output())
+ {
+
+   __ret = pos_type(_M_file.seekoff(__off, __way));
+   if (__ret != pos_type(off_type(-1)))
+     {
+       _M_reading = false;
+       _M_writing = false;
+       _M_ext_next = _M_ext_end = _M_ext_buf;
+       _M_set_buffer(-1);
+       _M_state_cur = __state;
+       __ret.state(_M_state_cur);
+     }
+ }
+      return __ret;
+    }
+
+  template<typename _CharT, typename _Traits>
+    bool
+    basic_filebuf<_CharT, _Traits>::
+    _M_terminate_output()
+    {
+
+      bool __testvalid = true;
+      if (this->pbase() < this->pptr())
+ {
+   const int_type __tmp = this->overflow();
+   if (traits_type::eq_int_type(__tmp, traits_type::eof()))
+     __testvalid = false;
+ }
+
+
+      if (_M_writing && !__check_facet(_M_codecvt).always_noconv()
+   && __testvalid)
+ {
+
+
+
+   const size_t __blen = 128;
+   char __buf[__blen];
+   codecvt_base::result __r;
+   streamsize __ilen = 0;
+
+   do
+     {
+       char* __next;
+       __r = _M_codecvt->unshift(_M_state_cur, __buf,
+     __buf + __blen, __next);
+       if (__r == codecvt_base::error)
+  __testvalid = false;
+       else if (__r == codecvt_base::ok ||
+         __r == codecvt_base::partial)
+  {
+    __ilen = __next - __buf;
+    if (__ilen > 0)
+      {
+        const streamsize __elen = _M_file.xsputn(__buf, __ilen);
+        if (__elen != __ilen)
+   __testvalid = false;
+      }
+  }
+     }
+   while (__r == codecvt_base::partial && __ilen > 0 && __testvalid);
+
+   if (__testvalid)
+     {
+
+
+
+
+       const int_type __tmp = this->overflow();
+       if (traits_type::eq_int_type(__tmp, traits_type::eof()))
+  __testvalid = false;
+     }
+ }
+      return __testvalid;
+    }
+
+  template<typename _CharT, typename _Traits>
+    int
+    basic_filebuf<_CharT, _Traits>::
+    sync()
+    {
+
+
+      int __ret = 0;
+      if (this->pbase() < this->pptr())
+ {
+   const int_type __tmp = this->overflow();
+   if (traits_type::eq_int_type(__tmp, traits_type::eof()))
+     __ret = -1;
+ }
+      return __ret;
+    }
+
+  template<typename _CharT, typename _Traits>
+    void
+    basic_filebuf<_CharT, _Traits>::
+    imbue(const locale& __loc)
+    {
+      bool __testvalid = true;
+
+      const __codecvt_type* _M_codecvt_tmp = 0;
+      if (__builtin_expect(has_facet<__codecvt_type>(__loc), true))
+ _M_codecvt_tmp = &use_facet<__codecvt_type>(__loc);
+
+      if (this->is_open())
+ {
+
+   if ((_M_reading || _M_writing)
+       && __check_facet(_M_codecvt).encoding() == -1)
+     __testvalid = false;
+   else
+     {
+       if (_M_reading)
+  {
+    if (__check_facet(_M_codecvt).always_noconv())
+      {
+        if (_M_codecvt_tmp
+     && !__check_facet(_M_codecvt_tmp).always_noconv())
+   __testvalid = this->seekoff(0, ios_base::cur, _M_mode)
+                 != pos_type(off_type(-1));
+      }
+    else
+      {
+
+        _M_ext_next = _M_ext_buf
+   + _M_codecvt->length(_M_state_last, _M_ext_buf, _M_ext_next,
+          this->gptr() - this->eback());
+        const streamsize __remainder = _M_ext_end - _M_ext_next;
+        if (__remainder)
+   std::memmove(_M_ext_buf, _M_ext_next, __remainder);
+
+        _M_ext_next = _M_ext_buf;
+        _M_ext_end = _M_ext_buf + __remainder;
+        _M_set_buffer(-1);
+        _M_state_last = _M_state_cur = _M_state_beg;
+      }
+  }
+       else if (_M_writing && (__testvalid = _M_terminate_output()))
+  _M_set_buffer(-1);
+     }
+ }
+
+      if (__testvalid)
+ _M_codecvt = _M_codecvt_tmp;
+      else
+ _M_codecvt = 0;
+    }
+
+
+
+
+
+  extern template class basic_filebuf<char>;
+  extern template class basic_ifstream<char>;
+  extern template class basic_ofstream<char>;
+  extern template class basic_fstream<char>;
+
+
+  extern template class basic_filebuf<wchar_t>;
+  extern template class basic_ifstream<wchar_t>;
+  extern template class basic_ofstream<wchar_t>;
+  extern template class basic_fstream<wchar_t>;
+
+
+}
+# 783 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/fstream" 2 3
+# 33 "/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/backward/fstream.h" 2 3
+
+using std::filebuf;
+using std::ifstream;
+using std::ofstream;
+using std::fstream;
+using std::streampos;
+
+
+using std::wfilebuf;
+using std::wifstream;
+using std::wofstream;
+using std::wfstream;
+using std::wstreampos;
+# 52 "ljs.cpp" 2
 
 
 
@@ -39568,6 +42439,10 @@ int main(int argc, char** argv)
   char* input_file = __null;
   int ghost_newton = 1;
   int sort = -1;
+  int Events[2] = {(PAPI_RES_STL_idx | ((int)0x80000000)), (PAPI_STL_ICY_idx | ((int)0x80000000))};
+  long long values[2];
+
+  int num_hwcntrs = 0;
 
   for(int i = 0; i < argc; i++) {
     if((strcmp(argv[i], "-i") == 0) || (strcmp(argv[i], "--input_file") == 0)) {
@@ -39586,6 +42461,10 @@ int main(int argc, char** argv)
     error = input(in, "in.lj.miniMD");
   else
     error = input(in, input_file);
+
+
+  if (PAPI_start_counters(Events, 2) != 0)
+      error=1;
 
   if(error) {
     MPI_Finalize();
@@ -39962,7 +42841,7 @@ int main(int argc, char** argv)
     double time_other = timer.array[0] - timer.array[2] - timer.array[3] - timer.array[1];
     printf("\n\n");
     printf("# Performance Summary:\n");
-# 487 "ljs.cpp"
+# 497 "ljs.cpp"
     printf("# No. MPI proc:%i \n", nprocs);
     printf("# No. OMP threads: %i\n", num_threads);
     printf("# Total time: %lf seconds\n", timer.array[0]);
@@ -39974,6 +42853,17 @@ int main(int argc, char** argv)
   delete force;
 
   MPI_Barrier(((MPI_Comm) ((void *) &(ompi_mpi_comm_world))));
+
+  if (PAPI_stop_counters(values, 2) != 0) {
+    MPI_Finalize();
+    exit(0);
+  }
+
+  if(me==0)
+    std::cout << "# PAPI Report" << std::endl;
+
+  std::cout <<"Rank " << me << " PAPI_RES_STL "<< values[0] << std::endl;
+  std::cout <<"Rank " << me << " PAPI_STL_ICL "<< values[1] << std::endl;
 
   MPI_Finalize();
   return 0;

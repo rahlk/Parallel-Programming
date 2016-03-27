@@ -12,10 +12,10 @@ SIMD = yes
 # System-specific settings
 
 CC =		mpicxx
-CCFLAGS =	-I/usr/local/include -O3 -DMPICH_IGNORE_CXX_SEEK -fopenmp -DNOCHUNK 
+CCFLAGS = -O3 -DMPICH_IGNORE_CXX_SEEK -fopenmp -DNOCHUNK 
 LINK =		mpicxx 
 LINKFLAGS =	-O3 -fopenmp -L/usr/local/lib -lpapi
-USRLIB = 
+USRLIB = -I/usr/local/include 
 SYSLIB =	
 SIZE =		size
 

@@ -32,7 +32,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "mpi.h"
-#include "pmpi.h"
+#include "papi.h"
 #include "variant.h"
 #include "ljs.h"
 #include "atom.h"
@@ -47,8 +47,10 @@
 #include "force_eam.h"
 #include "force.h"
 #include "force_lj.h"
-
+#include "iostream.h"
+#include "fstream.h"
 #define MAXLINE 256
+#define NUM_EVENTS 2
 
 int input(In &, const char*);
 void create_box(Atom &, int, int, int, double);
@@ -82,6 +84,10 @@ int main(int argc, char** argv)
   char* input_file = NULL;
   int ghost_newton = 1;
   int sort = -1;
+  int Events[NUM_EVENTS] = {PAPI_RES_STL, PAPI_STL_ICY};
+  long_long values[NUM_EVENTS];
+
+  int num_hwcntrs = 0;
 
   for(int i = 0; i < argc; i++) {
     if((strcmp(argv[i], "-i") == 0) || (strcmp(argv[i], "--input_file") == 0)) {
@@ -100,6 +106,10 @@ int main(int argc, char** argv)
     error = input(in, "in.lj.miniMD");
   else
     error = input(in, input_file);
+
+  /* Initialize the PAPI library and get the number of counters available */
+  if (PAPI_start_counters(Events, NUM_EVENTS) != PAPI_OK)
+      error=1;
 
   if(error) {
     MPI_Finalize();
@@ -279,7 +289,7 @@ int main(int argc, char** argv)
   threads.mpi_num_threads = nprocs;
   threads.omp_me = 0;
 #pragma omp parallel
- { 
+ {
   num_threads=omp_get_num_threads();
  }
   threads.omp_num_threads = num_threads;
@@ -441,7 +451,7 @@ int main(int argc, char** argv)
   #pragma omp parallel
   {
     neighbor.build(atom);
-  
+
     force->compute(atom, neighbor, comm, me);
   }
 
@@ -483,7 +493,7 @@ int main(int argc, char** argv)
            timer.array[TIME_TOTAL], timer.array[TIME_FORCE], timer.array[TIME_NEIGH], timer.array[TIME_COMM], time_other,
            1.0 * natoms * integrate.ntimes / timer.array[TIME_TOTAL], 1.0 * natoms * integrate.ntimes / timer.array[TIME_TOTAL] / nprocs / num_threads, timer.array[TIME_TEST]);
 #endif
-  
+
     printf("# No. MPI proc:%i \n", nprocs);
     printf("# No. OMP threads: %i\n", num_threads);
     printf("# Total time: %lf seconds\n", timer.array[TIME_TOTAL]);
@@ -496,7 +506,17 @@ int main(int argc, char** argv)
 
   MPI_Barrier(MPI_COMM_WORLD);
 
+  if (PAPI_stop_counters(values, NUM_EVENTS) != PAPI_OK) {
+    MPI_Finalize();
+    exit(0);
+  }
+
+  if(me==0)
+    std::cout << "# PAPI Report" << std::endl;
+
+  std::cout <<"Rank " << me << " PAPI_RES_STL "<< values[0] << std::endl;
+  std::cout <<"Rank " << me << " PAPI_STL_ICL "<< values[1] << std::endl;
+
   MPI_Finalize();
   return 0;
 }
-
