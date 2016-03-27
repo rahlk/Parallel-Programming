@@ -494,10 +494,10 @@ int main(int argc, char** argv)
            1.0 * natoms * integrate.ntimes / timer.array[TIME_TOTAL], 1.0 * natoms * integrate.ntimes / timer.array[TIME_TOTAL] / nprocs / num_threads, timer.array[TIME_TEST]);
 #endif
 
-    printf("# No. MPI proc:%i \n", nprocs);
+    printf("# No. MPI proc:    %i \n", nprocs);
     printf("# No. OMP threads: %i\n", num_threads);
-    printf("# Total time: %lf seconds\n", timer.array[TIME_TOTAL]);
-    printf("# problem size: %dx%dx%d\n", in.nx, in.ny, in.nz);
+    printf("# Total time:      %lf seconds\n", timer.array[TIME_TOTAL]);
+    printf("# problem size:    %dx%dx%d\n", in.nx, in.ny, in.nz);
   }
   if(yaml_output)
     output(in, atom, force, neighbor, comm, thermo, integrate, timer, screen_yaml);
