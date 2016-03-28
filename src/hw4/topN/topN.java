@@ -1,3 +1,10 @@
+/** Top N Words
+ * 
+ * rkrish11 Rahul Krishna 
+ * 
+ * 
+ */
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -12,12 +19,6 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * Created with IntelliJ IDEA.
- * User: andrea
- * Date: 3/7/14
- * Time: 9:19 AM
- */
 public class topN {
 
     public static void main(String[] args) throws Exception {
@@ -120,8 +121,7 @@ public class topN {
     }
 
     /*
-   * sorts the map by values. Taken from:
-   * http://javarevisited.blogspot.it/2012/12/how-to-sort-hashmap-java-by-key-and-value.html
+   * sorts the map by values. 
    */
     private static <K extends Comparable, V extends Comparable> Map<K, V> sortByValues(Map<K, V> map) {
         List<Map.Entry<K, V>> entries = new LinkedList<Map.Entry<K, V>>(map.entrySet());
